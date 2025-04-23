@@ -1,5 +1,6 @@
 import { Controller } from "../../controller";
 import { Get } from "../../createMethodDecorator";
+import { Param } from "../../createParamDecorator";
 import { UserService } from "../services/UserService";
 
 
@@ -10,5 +11,10 @@ export class UserController {
     @Get('/')
     getAll() {
         return this.userService.getUsers();
+    }
+
+    @Get('/:id')
+    getById(@Param('id') id: string) {
+        return this.userService.getUserById(id);
     }
 }

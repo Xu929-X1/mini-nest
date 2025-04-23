@@ -26,6 +26,14 @@ class RouteRegistry {
     find(method: string, url: string): RouteRecord | undefined {
         return this.routeTable.get(url)?.find(r => r.method === method);
     }
+
+    getAllRoutes() {
+        const allRoutes: RouteRecord[] = [];
+        this.routeTable.forEach(routes => {
+            allRoutes.push(...routes);
+        });
+        return allRoutes;
+    }
 }
 
 export const routeRegistry = new RouteRegistry();

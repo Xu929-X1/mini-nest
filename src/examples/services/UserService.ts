@@ -9,4 +9,10 @@ export class UserService {
         this.logger.log('Fetching users...');
         return ['Alice', 'Bob', 'Charlie'];
     }
+
+    getUserById(id: string) {
+        this.logger.log(`Fetching user with id: ${id}`);
+        return { id, name: 'Alice' };
+    }
+
 }

@@ -2,8 +2,9 @@ export interface Constructor<T = any> extends Function {
     new(...args: any[]): T;
 }
 class Container {
-
+    // DI container
     private container = new Map<Constructor, any>();
+    // dep map
     private depMap = new Map<Constructor, Constructor[]>();
     constructor() {
     }
@@ -12,9 +13,9 @@ class Container {
         if (deps) {
             this.depMap.set(token, deps);
         }
-        
     }
 
+    // resolve a token, if it is not in the container, create a new instance and store it in the container
     resolve<T>(token: Constructor<T>): T {
         if (this.container.has(token)) {
             return this.container.get(token) as T;
