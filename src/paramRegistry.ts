@@ -1,6 +1,6 @@
 import { Constructor } from "./container";
 
-type ParamSource = 'body' | 'query' | 'params' | 'headers';
+type ParamSource = 'body' | 'query' | 'param' | 'header';
 type TypeInfo = {
     name: string;
     raw: any; // Original Contructor

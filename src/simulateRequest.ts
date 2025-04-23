@@ -7,7 +7,6 @@ import { normalizeUrl } from "./utils/normalizePath";
 
 export function simulateRequest(url: string, method: HttpMethod, body?: object) {
     url = normalizeUrl(url);
-
     const allRoutes = routeRegistry.getAllRoutes();
     const matchingRoute = allRoutes.find(route => {
         if (route.method !== method) return false;

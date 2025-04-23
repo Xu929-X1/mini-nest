@@ -6,9 +6,15 @@ interface RequestContext {
     params?: Record<string, string>;
     headers?: Record<string, string>;
 }
-
+const sourceToContextField: Record<ParamMetadata["source"], keyof RequestContext> = {
+    param: 'params',
+    query: 'query',
+    header: 'headers',
+    body: 'body',
+};
 function getValFromReq(source: ParamMetadata["source"], key: string | undefined, req: RequestContext) {
-    const sourceData = req[source];
+    const field = sourceToContextField[source];
+    const sourceData = req[field];
     if (!sourceData) {
         return undefined;
     }
@@ -16,6 +22,7 @@ function getValFromReq(source: ParamMetadata["source"], key: string | undefined,
 }
 
 export function resolveHandlerArgument(controllerClass: Constructor, methodName: string, req: RequestContext) {
+    console.log(paramRegistry.get(controllerClass));
     const methodParams = paramRegistry.get(controllerClass)?.get(methodName.toString());
     const args: any[] = [];
     if (!methodParams) {

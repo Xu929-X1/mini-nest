@@ -19,7 +19,7 @@ export function routeMatch(routePattern: string, path: string) {
             return { matched: false };
         }
     }
-
+    console.log('Route matched:', routePattern, '→', path, 'with params:', params);
     return { matched: true, params };
 
 }

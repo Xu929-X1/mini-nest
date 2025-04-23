@@ -42,7 +42,7 @@ function createMethodDecorator(key: ParamMetadata['source']): (paramKey: string)
 
 const Body = createMethodDecorator("body");
 const Query = createMethodDecorator("query");
-const Param = createMethodDecorator("params");
-const Header = createMethodDecorator("headers");
+const Param = createMethodDecorator("param");
+const Header = createMethodDecorator("header");
 
 export { Body, Query, Param, Header };
