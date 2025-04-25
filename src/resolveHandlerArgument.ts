@@ -22,7 +22,6 @@ function getValFromReq(source: ParamMetadata["source"], key: string | undefined,
 }
 
 export function resolveHandlerArgument(controllerClass: Constructor, methodName: string, req: RequestContext) {
-    console.log(paramRegistry.get(controllerClass));
     const methodParams = paramRegistry.get(controllerClass)?.get(methodName.toString());
     const args: any[] = [];
     if (!methodParams) {

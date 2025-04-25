@@ -2,31 +2,50 @@ import { container } from "./container";
 import { HttpMethod } from "./createMethodDecorator";
 import { resolveHandlerArgument } from "./resolveHandlerArgument";
 import { routeMatch } from "./routeMatch";
-import { routeRegistry } from "./routeRegistry";
+import { RouteRecord, routeRegistry } from "./routeRegistry";
 import { normalizeUrl } from "./utils/normalizePath";
 
+function parseQuery(url: string): Record<string, string> {
+    if (!url.includes("?")) {
+        return {};
+    }
+    const queryString = url.split("?")[1];
+    const params: Record<string, string> = {};
+    const pairs = queryString.split("&");
+    for (const pair of pairs) {
+        const [key, value] = pair.split("=");
+        params[decodeURIComponent(key)] = decodeURIComponent(value || "");
+    }
+    return params;
+}
+
 export function simulateRequest(url: string, method: HttpMethod, body?: object) {
-    url = normalizeUrl(url);
     const allRoutes = routeRegistry.getAllRoutes();
-    const matchingRoute = allRoutes.find(route => {
-        if (route.method !== method) return false;
-        const result = routeMatch(route.url, url);
-        return result.matched;
-    });
+
+    let matchingRoute: RouteRecord | undefined;
+    let routeParams: Record<string, string> = {};
+    const queryParams = parseQuery(url);
+    const cleanURL = normalizeUrl(url.split("?")[0]);
+    for (const route of allRoutes) {
+        if (route.method !== method) continue;
+        const match = routeMatch(route.url, cleanURL);
+        if (match.matched) {
+            matchingRoute = route;
+            routeParams = match.params || {};
+            break;
+        }
+    }
 
     if (!matchingRoute) {
         throw new Error(`No route found for ${method} ${url}`);
     }
-
     const { controllerClass, handlerName, url: routeUrl } = matchingRoute;
-    const routeParams = routeMatch(routeUrl, url).params;
-
     const controllerInstance = container.resolve(controllerClass);
     const handler = controllerInstance[handlerName];
 
     const args = resolveHandlerArgument(controllerClass, handlerName, {
         body: body || {},
-        query: {},         // 可扩展
+        query: queryParams,         // 可扩展
         params: routeParams,
         headers: {},        // 可扩展
     });

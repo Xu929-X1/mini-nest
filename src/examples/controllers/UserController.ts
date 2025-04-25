@@ -1,6 +1,6 @@
 import { Controller } from "../../controller";
 import { Get } from "../../createMethodDecorator";
-import { Param } from "../../createParamDecorator";
+import { Param, Query } from "../../createParamDecorator";
 import { UserService } from "../services/UserService";
 
 
@@ -14,7 +14,11 @@ export class UserController {
     }
 
     @Get('/:id')
-    getById(@Param('id') id: string) {
-        return this.userService.getUserById(id);
+    getUser(@Param('id') id: string, @Query('verbose') v: string) {
+        if (v === 'true') {
+            return this.userService.getVerboseUser(id);
+        } else {
+            return this.userService.getUserById(id);
+        }
     }
 }
