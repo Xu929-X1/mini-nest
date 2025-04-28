@@ -1,6 +1,6 @@
 import { Controller } from "../../controller";
-import { Get } from "../../createMethodDecorator";
-import { Param, Query } from "../../createParamDecorator";
+import { Get, Post } from "../../createMethodDecorator";
+import { Body, Header, Param, Query } from "../../createParamDecorator";
 import { UserService } from "../services/UserService";
 
 
@@ -20,5 +20,16 @@ export class UserController {
         } else {
             return this.userService.getUserById(id);
         }
+    }
+
+    @Post('/:id')
+    createUser(
+        @Param('id') id: number,
+        @Query('expand') expand: string,
+        @Body('name') name: string,
+        @Header('authorization') token: string
+    ) {
+        console.log('Injected parameters:', { id, expand, name, token });
+        return this.userService.createUser(id, name, expand, token);
     }
 }

@@ -20,4 +20,9 @@ export class UserService {
         return { id, name: 'Alice', age: 30, email: 'example@example.com' };
     }
 
+    createUser(id: number, name: string, expand: string, token: string) {
+        this.logger.log(`Creating user with id: ${id}, name: ${name}, expand: ${expand}, token: ${token}`);
+        return { id, name, expand, token };
+    }
+
 }
