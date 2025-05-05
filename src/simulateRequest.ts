@@ -47,6 +47,9 @@ export function simulateRequest(url: string, method: HttpMethod, options?: {
         params: routeParams,
         headers: options?.headers,
     });
+
+    
+
     try {
         const result = handler.apply(controllerInstance, args);
         if (result instanceof Promise) {
