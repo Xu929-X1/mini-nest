@@ -23,7 +23,7 @@ class RouteRegistry {
         this.routeTable.set(url, existing);
     }
 
-    find(method: string, url: string): RouteRecord | undefined {
+    get(method: string, url: string): RouteRecord | undefined {
         return this.routeTable.get(url)?.find(r => r.method === method);
     }
 
@@ -33,6 +33,10 @@ class RouteRegistry {
             allRoutes.push(...routes);
         });
         return allRoutes;
+    }
+
+    clear() {
+        this.routeTable.clear();
     }
 }
 

@@ -4,8 +4,8 @@ export interface Interceptor {
 }
 type MethodInterceptorMap = Map<string, Constructor<Interceptor>[]>;
 
-const classInterceptors = new Map<Constructor, Constructor<Interceptor>[]>();
-const methodInterceptors = new Map<Constructor, MethodInterceptorMap>();
+export const classInterceptors = new Map<Constructor, Constructor<Interceptor>[]>();
+export const methodInterceptors = new Map<Constructor, MethodInterceptorMap>();
 
 type ClassOrPrototype = Constructor | Record<string, any>;
 export function resolveController(target: any): Constructor {
