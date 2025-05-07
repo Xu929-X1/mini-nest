@@ -42,4 +42,40 @@ class RouteRegistry {
 
 export const routeRegistry = new RouteRegistry();
 // this is to store the corresponding controller class for the route, will use this for lookup when controller decorated class is loaded
-export const routeMetadata = new Map<Object, RouteRecord[]>(); 
+export const routeMetadata = new Map<Object, RouteRecord[]>();
+
+type RouteTrieNode = {
+    segment: string;
+    children: Map<string, RouteTrieNode>;
+    paramChild?: RouteTrieNode;
+    paramName?: string;
+    handler?: RouteRecord;
+}
+
+class TrieRoute {
+    private root: RouteTrieNode = { segment: '', children: new Map() };
+
+    addRoute(route: RouteRecord) {
+        const segments = route.url.split('/').filter(Boolean);
+        let currentNode = this.root;
+
+        for (const segment of segments) {
+            if (segment.startsWith(':')) {
+                if (!currentNode.paramChild) {
+                    currentNode.paramChild = { segment, children: new Map() };
+                }
+                currentNode = currentNode.paramChild;
+                currentNode.paramName = segment.slice(1); // remove ':'
+            } else {
+                if (!currentNode.children.has(segment)) {
+                    currentNode.children.set(segment, { segment, children: new Map() });
+                }
+                currentNode = currentNode.children.get(segment)!;
+            }
+        }
+
+        currentNode.handler = route;
+    }
+
+   
+}
