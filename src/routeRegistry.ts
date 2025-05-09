@@ -7,58 +7,25 @@ export type RouteRecord = {
     handlerName: string;
     controllerClass: Constructor;
 };
-
-class RouteRegistry {
-    private routeTable = new Map<string, RouteRecord[]>();
-
-    registerRoute(
-        method: string,
-        url: string,
-        handlerName: string,
-        controllerClass: Constructor //this is to store the corresponding controller class for the route
-    ) {
-        const route: RouteRecord = { method, url, handlerName, controllerClass };
-        const existing = this.routeTable.get(url) || [];
-        existing.push(route);
-        this.routeTable.set(url, existing);
-    }
-
-    get(method: string, url: string): RouteRecord | undefined {
-        return this.routeTable.get(url)?.find(r => r.method === method);
-    }
-
-    getAllRoutes() {
-        const allRoutes: RouteRecord[] = [];
-        this.routeTable.forEach(routes => {
-            allRoutes.push(...routes);
-        });
-        return allRoutes;
-    }
-
-    clear() {
-        this.routeTable.clear();
-    }
-}
-
-export const routeRegistry = new RouteRegistry();
-// this is to store the corresponding controller class for the route, will use this for lookup when controller decorated class is loaded
-export const routeMetadata = new Map<Object, RouteRecord[]>();
-
-type RouteTrieNode = {
+export type RouteTrieNode = {
     segment: string;
     children: Map<string, RouteTrieNode>;
     paramChild?: RouteTrieNode;
     paramName?: string;
     handler?: RouteRecord;
 }
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD';
 
 class TrieRoute {
-    private root: RouteTrieNode = { segment: '', children: new Map() };
+    private root = new Map<string, RouteTrieNode>();
 
-    addRoute(route: RouteRecord) {
+    addRoute(method: HttpMethod, route: RouteRecord) {
         const segments = route.url.split('/').filter(Boolean);
-        let currentNode = this.root;
-
+        let currentNode = this.root.get(method);
+        if (!currentNode) {
+            currentNode = { segment: method, children: new Map() };
+            this.root.set(method, currentNode);
+        }
         for (const segment of segments) {
             if (segment.startsWith(':')) {
                 if (!currentNode.paramChild) {
@@ -77,5 +44,70 @@ class TrieRoute {
         currentNode.handler = route;
     }
 
-   
+    findRoute(method: HttpMethod, url: string): { route: RouteRecord | undefined, params: Record<string, string> } | undefined {
+        const segments = url.split('/').filter(Boolean);
+        let currentNode: RouteTrieNode | undefined = this.root.get(method);
+        if (!currentNode) {
+            throw new Error(`No routes found for method ${method}`);
+        };
+        const params: Record<string, string> = {};
+
+        for (const segment of segments) {
+            if (currentNode?.children.has(segment)) {
+                currentNode = currentNode.children.get(segment)!;
+            } else if (currentNode?.paramChild) {
+                params[currentNode.paramName!] = segment; // store param value
+                currentNode = currentNode.paramChild;
+            } else {
+                return undefined; // no match
+            }
+        }
+        return currentNode?.handler ? {
+            route: currentNode.handler,
+            params: params,
+        } : undefined;
+    }
+
+    clear() {
+        this.root = new Map<string, RouteTrieNode>();
+    }
+
+    deleteRoute(method: HttpMethod, route: RouteRecord) {
+        const segments = route.url.split('/').filter(Boolean);
+        let currentNode = this.root.get(method);
+        if (!currentNode) {
+            throw new Error(`No routes found for method ${method}`);
+        }
+        const stack: RouteTrieNode[] = [];
+
+        for (const segment of segments) {
+            if (currentNode.children.has(segment)) {
+                stack.push(currentNode);
+                currentNode = currentNode.children.get(segment)!;
+            } else if (currentNode.paramChild) {
+                stack.push(currentNode);
+                currentNode = currentNode.paramChild;
+            } else {
+                return; // no match, nothing to delete
+            }
+        }
+
+        if (currentNode.handler) {
+            currentNode.handler = undefined; // remove the handler
+        }
+        // Clean up the trie if necessary
+        for (let i = stack.length - 1; i >= 0; i--) {
+            const parentNode = stack[i];
+            if (currentNode.children.size === 0 && !currentNode.paramChild) {
+                parentNode.children.delete(currentNode.segment);
+                currentNode = parentNode;
+            } else {
+                break; // stop if we find a node with children
+            }
+        }
+    }
+
+
 }
+
+export const routeRegistryTrie = new TrieRoute();

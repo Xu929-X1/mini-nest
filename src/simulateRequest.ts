@@ -2,7 +2,7 @@ import { container } from "./container";
 import { HttpMethod } from "./createMethodDecorator";
 import { resolveHandlerArguments } from "./resolveHandlerArgument";
 import { routeMatch } from "./routeMatch";
-import { RouteRecord, routeRegistry } from "./routeRegistry";
+import { RouteRecord, routeRegistryTrie, RouteTrieNode } from "./routeRegistry";
 import { normalizeUrl } from "./utils/normalizePath";
 
 function parseQuery(url: string): Record<string, string> {
@@ -19,44 +19,36 @@ function parseQuery(url: string): Record<string, string> {
 export function simulateRequest(url: string, method: HttpMethod, options?: {
     body?: any; headers?: Record<string, string>
 }) {
-    const allRoutes = routeRegistry.getAllRoutes();
-    let matchingRoute: RouteRecord | undefined;
-    let routeParams: Record<string, string> = {};
+    url = normalizeUrl(url);
+    const matchingRoute = routeRegistryTrie.findRoute(method, url);
     const rawQuery = parseQuery(url);
-    const cleanURL = normalizeUrl(url.split("?")[0]);
-    for (const route of allRoutes) {
-        if (route.method !== method) continue;
-        const match = routeMatch(route.url, cleanURL);
-        if (match.matched) {
-            matchingRoute = route;
-            routeParams = match.params || {};
-            break;
-        }
-    }
-
     if (!matchingRoute) {
         throw new Error(`No route found for ${method} ${url}`);
     }
-    const { controllerClass, handlerName, url: routeUrl } = matchingRoute;
+    const { controllerClass, handlerName, url: routeUrl } = matchingRoute.route as RouteRecord;
     const controllerInstance = container.resolve(controllerClass);
     const handler = controllerInstance[handlerName];
 
     const args = resolveHandlerArguments(controllerClass, handlerName, {
-        body: options?.body,
+        body: options?.body ?? {},
         query: rawQuery,
-        params: routeParams,
-        headers: options?.headers,
+        params: matchingRoute.params,
+        headers: options?.headers ?? {},
     });
 
-    
+
 
     try {
         const result = handler.apply(controllerInstance, args);
-        if (result instanceof Promise) {
-            result.then(res => console.log('Response:', res)).catch(console.error);
-        } else {
-            console.log('Response:', result);
-        }
+        return result instanceof Promise
+            ? result.then(res => {
+                console.log('Response:', res);
+                return res;
+            }).catch(err => {
+                console.error(err);
+                throw err;
+            })
+            : (console.log('Response:', result), result);
     } catch (e) {
         console.error('Handler error:', e);
     }
