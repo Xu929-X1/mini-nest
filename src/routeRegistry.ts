@@ -1,4 +1,5 @@
 import { Constructor } from "./container";
+import { classInterceptors, Interceptor, methodInterceptors } from "./interceptor";
 
 export type RouteRecord = {
     method: string;
@@ -6,6 +7,7 @@ export type RouteRecord = {
     fullUrl?: string;
     handlerName: string;
     controllerClass: Constructor;
+    interceptors?: Constructor<Interceptor>[];
 };
 export type RouteTrieNode = {
     segment: string;
@@ -40,7 +42,12 @@ class TrieRoute {
                 currentNode = currentNode.children.get(segment)!;
             }
         }
-
+        const cInterceptors = classInterceptors.get(route.controllerClass);
+        const mInterceptors = methodInterceptors.get(route.controllerClass)?.get(route.handlerName) ?? [];
+        const allInterceptors = [...(cInterceptors ?? []), ...mInterceptors];
+        if (allInterceptors.length > 0) {
+            route.interceptors = allInterceptors;
+        }
         currentNode.handler = route;
     }
 

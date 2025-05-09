@@ -1,7 +1,7 @@
 import { container } from "./container";
 import { HttpMethod } from "./createMethodDecorator";
+import { applyInterceptors, classInterceptors } from "./interceptor";
 import { resolveHandlerArguments } from "./resolveHandlerArgument";
-import { routeMatch } from "./routeMatch";
 import { RouteRecord, routeRegistryTrie, RouteTrieNode } from "./routeRegistry";
 import { normalizeUrl } from "./utils/normalizePath";
 
@@ -16,7 +16,7 @@ function parseQuery(url: string): Record<string, string> {
     return params;
 }
 
-export function simulateRequest(url: string, method: HttpMethod, options?: {
+export async function simulateRequest(url: string, method: HttpMethod, options?: {
     body?: any; headers?: Record<string, string>
 }) {
     url = normalizeUrl(url);
@@ -36,10 +36,15 @@ export function simulateRequest(url: string, method: HttpMethod, options?: {
         headers: options?.headers ?? {},
     });
 
-
+    if (!handler) {
+        throw new Error(`Handler ${handlerName} not found on controller ${controllerClass.name}`);
+    }
 
     try {
-        const result = handler.apply(controllerInstance, args);
+        const interceptors = matchingRoute.route?.interceptors ?? [];
+        const result = await applyInterceptors(interceptors, () =>
+            handler.apply(controllerInstance, args)
+        );
         return result instanceof Promise
             ? result.then(res => {
                 console.log('Response:', res);

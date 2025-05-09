@@ -1,22 +1,21 @@
-import { Constructor } from "./container";
-import { RouteRecord, routeRegistry } from "./routeRegistry";
-import { ParamMetadata, paramRegistry } from "./paramRegistry";
+import { Constructor } from './container';
+import { RouteRecord, routeRegistryTrie } from './routeRegistry';
+import { ParamMetadata, paramRegistry } from './paramRegistry';
 import {
   Interceptor,
   classInterceptors,
   methodInterceptors,
-} from "./interceptor";
+} from './interceptor';
+import { HttpMethod } from './createMethodDecorator';
 
 export const metadata = {
   // 🟦 Route Metadata
-  getRoutes(controller: Constructor, url: string): RouteRecord[] {
-    return routeRegistry.get(controller, url) || [];
+  getRoute(method: HttpMethod, url: string): RouteRecord | undefined {
+    return routeRegistryTrie.findRoute(method, url)?.route;
   },
 
-  registerRoute(controller: Constructor, route: RouteRecord) {
-    const routes = routeRegistry.get(controller) || [];
-    routes.push(route);
-    routeRegistry.set(controller, routes);
+  registerRoute(route: RouteRecord) {
+    routeRegistryTrie.addRoute(route.method as HttpMethod, route);
   },
 
   // 🟨 Parameter Metadata
@@ -75,7 +74,7 @@ export const metadata = {
 
   // 🧹 Optional Cleanup
   clearAll() {
-    routeRegistry.clear();
+    routeRegistryTrie.clear();
     paramRegistry.clear();
     classInterceptors.clear();
     methodInterceptors.clear();

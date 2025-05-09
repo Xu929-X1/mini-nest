@@ -1,27 +1,27 @@
 import { Constructor } from "./container";
-import { routeMetadata, RouteRecord } from "./routeRegistry";
+import { RouteRecord, routeRegistryTrie } from "./routeRegistry";
+import { normalizePath } from "./utils/normalizePath";
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-function createMethodDecorator<T extends Function>(method: HttpMethod) {
+function createMethodDecorator(method: HttpMethod) {
     return function (url: string) {
         return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
-            // Register the route in the route registry
-            const newRoute: RouteRecord = {
-                method: method,
-                url, // at this point, target is the class prototype, concatneate later
+            const controller = (target as any).constructor;
+            const prefix = Reflect.getMetadata('prefix', controller) ?? '';
+            const fullUrl = normalizePath(prefix, url);
+
+            const route: RouteRecord = {
+                method,
+                url: fullUrl,
                 handlerName: propertyKey,
-                controllerClass: target.constructor as Constructor<any>,
+                controllerClass: controller,
             };
-            // Register the controller class with routeMetadata
-            const existingRoutes = routeMetadata.get(target.constructor);
-            if (existingRoutes) {
-                existingRoutes.push(newRoute);
-            } else {
-                routeMetadata.set(target.constructor, [newRoute]);
-            }
-        }
-    }
+
+            routeRegistryTrie.addRoute(method, route);
+        };
+    };
 }
+
 
 const Get = createMethodDecorator('GET');
 const Post = createMethodDecorator('POST');
