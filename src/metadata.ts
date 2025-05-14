@@ -23,7 +23,6 @@ export const metadata = {
     const newRoute: RouteRecord = {
       method,
       url,
-      fullUrl: url,
       handlerName,
       controllerClass: controller,
     };
@@ -41,9 +40,9 @@ export const metadata = {
     }
     for (const route of routes) {
       if (route.url.startsWith('/')) {
-        route.url = baseUrl + route.url;
+        route.fullUrl = baseUrl + route.url;
       } else {
-        route.url = baseUrl + '/' + route.url;
+        route.fullUrl = baseUrl + '/' + route.url;
       }
       this.registerRoute(route);
     }

@@ -22,7 +22,7 @@ class TrieRoute {
     private root = new Map<string, RouteTrieNode>();
 
     addRoute(method: HttpMethod, route: RouteRecord) {
-        const segments = route.url.split('/').filter(Boolean);
+        const segments = (route.fullUrl as string).split('/').filter(Boolean);
         let currentNode = this.root.get(method);
         if (!currentNode) {
             currentNode = { segment: method, children: new Map() };
@@ -52,23 +52,26 @@ class TrieRoute {
     }
 
     findRoute(method: HttpMethod, url: string): { route: RouteRecord | undefined, params: Record<string, string> } | undefined {
-        const segments = url.split('/').filter(Boolean);
+        const cleanPath = url.split('?')[0];
+        const segments = cleanPath.split('/').filter(Boolean);
         let currentNode: RouteTrieNode | undefined = this.root.get(method);
         if (!currentNode) {
             throw new Error(`No routes found for method ${method}`);
         };
         const params: Record<string, string> = {};
 
+
         for (const segment of segments) {
             if (currentNode?.children.has(segment)) {
                 currentNode = currentNode.children.get(segment)!;
             } else if (currentNode?.paramChild) {
-                params[currentNode.paramName!] = segment; // store param value
+                params[currentNode.paramChild.paramName!] = segment;
                 currentNode = currentNode.paramChild;
             } else {
-                return undefined; // no match
+                return undefined;
             }
         }
+        console.log("Final Node:", currentNode);
         return currentNode?.handler ? {
             route: currentNode.handler,
             params: params,

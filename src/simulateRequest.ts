@@ -1,3 +1,4 @@
+import { match } from "assert";
 import { container } from "./container";
 import { HttpMethod } from "./createMethodDecorator";
 import { applyInterceptors, classInterceptors } from "./interceptor";
@@ -28,14 +29,13 @@ export async function simulateRequest(url: string, method: HttpMethod, options?:
     const { controllerClass, handlerName, url: routeUrl } = matchingRoute.route as RouteRecord;
     const controllerInstance = container.resolve(controllerClass);
     const handler = controllerInstance[handlerName];
-
+    console.log("[Matching Routes]:", matchingRoute);
     const args = resolveHandlerArguments(controllerClass, handlerName, {
         body: options?.body ?? {},
         query: rawQuery,
         params: matchingRoute.params,
         headers: options?.headers ?? {},
     });
-
     if (!handler) {
         throw new Error(`Handler ${handlerName} not found on controller ${controllerClass.name}`);
     }

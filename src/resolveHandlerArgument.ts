@@ -17,7 +17,7 @@ export function resolveHandlerArguments(
     if (!methodParams || methodParams.length === 0) {
         return [];
     }
-
+    console.log('Method Params:', methodParams);
     const args: any[] = [];
 
     for (const meta of methodParams) {
