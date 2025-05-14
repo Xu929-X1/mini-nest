@@ -28,11 +28,6 @@ export async function simulateRequest(url: string, method: HttpMethod, options?:
     const { controllerClass, handlerName, url: routeUrl } = matchingRoute.route as RouteRecord;
     const controllerInstance = container.resolve(controllerClass);
     const handler = controllerInstance[handlerName];
-    console.log('Controller:', controllerInstance);
-    console.log("handler:", handler);
-    console.log('Handler:', handlerName);
-    console.log('Route URL:', routeUrl);
-    console.log('Method:', method);
 
     const args = resolveHandlerArguments(controllerClass, handlerName, {
         body: options?.body ?? {},
