@@ -7,7 +7,7 @@ import {
   methodInterceptors,
 } from './interceptor';
 import { HttpMethod } from './createMethodDecorator';
-
+const routeMetaData = new Map<Constructor, RouteRecord[]>();
 export const metadata = {
   // 🟦 Route Metadata
   getRoute(method: HttpMethod, url: string): RouteRecord | undefined {
@@ -16,6 +16,37 @@ export const metadata = {
 
   registerRoute(route: RouteRecord) {
     routeRegistryTrie.addRoute(route.method as HttpMethod, route);
+  },
+
+  registerRouteOnMethodDecoratorLoad(controller: Constructor, url: string, method: HttpMethod, handlerName: string) {
+    const route = routeMetaData.get(controller) || [];
+    const newRoute: RouteRecord = {
+      method,
+      url,
+      fullUrl: url,
+      handlerName,
+      controllerClass: controller,
+    };
+    route.push(newRoute);
+    routeMetaData.set(controller, route);
+  },
+
+  finalizeRouteOnControllerLoad(
+    controller: Constructor,
+    baseUrl: string
+  ) {
+    const routes = routeMetaData.get(controller);
+    if (!routes) {
+      throw new Error(`No routes found for controller ${controller.name}`);
+    }
+    for (const route of routes) {
+      if (route.url.startsWith('/')) {
+        route.url = baseUrl + route.url;
+      } else {
+        route.url = baseUrl + '/' + route.url;
+      }
+      this.registerRoute(route);
+    }
   },
 
   // 🟨 Parameter Metadata

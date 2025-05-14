@@ -114,6 +114,9 @@ class TrieRoute {
         }
     }
 
+    log() {
+        console.log(JSON.stringify(this.root, null, 2));
+    }
 
 }
 

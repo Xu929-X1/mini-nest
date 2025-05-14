@@ -1,4 +1,5 @@
-import { createTestApp } from './createTestApp';
-import { LogController } from './controllers/LogController';
+import { simulateRequest } from '../simulateRequest';
+import './controllers/LogController';
+import "reflect-metadata";
 
-createTestApp(LogController, '/log/test', 'GET');
+simulateRequest('/log/test', 'GET');
