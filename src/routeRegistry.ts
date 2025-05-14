@@ -71,7 +71,6 @@ class TrieRoute {
                 return undefined;
             }
         }
-        console.log("Final Node:", currentNode);
         return currentNode?.handler ? {
             route: currentNode.handler,
             params: params,
