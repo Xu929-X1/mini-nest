@@ -4,7 +4,7 @@ import { HttpMethod } from "./request/createMethodDecorator";
 import { applyInterceptors, classInterceptors } from "./request/interceptor";
 import { resolveHandlerArguments } from "./request/resolveHandlerArgument";
 import { RouteRecord, routeRegistryTrie, RouteTrieNode } from "./request/routeRegistry";
-import { normalizeUrl } from "./utils/normalizePath";
+import { normalizeUrl } from "./request/utils/normalizePath";
 
 function parseQuery(url: string): Record<string, string> {
     const dummyUrl = new URL('http://dummy' + url);

@@ -1,7 +1,7 @@
 import { Constructor } from "../container";
 import { metadata } from "./metadata";
 import { RouteRecord, routeRegistryTrie } from "./routeRegistry";
-import { normalizePath } from "../utils/normalizePath";
+import { normalizePath } from "./utils/normalizePath";
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 function createMethodDecorator(method: HttpMethod) {
