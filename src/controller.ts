@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { metadata } from './metadata';
+import { metadata } from './request/metadata';
 import { Constructor } from './container';
 
 export function Controller(baseUrl: string) {

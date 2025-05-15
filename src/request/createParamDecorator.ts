@@ -1,5 +1,6 @@
-import { Constructor } from "./container";
+import { Constructor } from "../container";
 import { ParamMetadata, paramRegistry } from "./paramRegistry";
+
 
 function registerParam(target: Object, propertyKey: string | symbol | undefined, meta: ParamMetadata) {
     const controller = target.constructor;

@@ -1,6 +1,6 @@
 import { Controller } from "../../controller";
-import { Get, Post } from "../../createMethodDecorator";
-import { Body, Header, Param, Query } from "../../createParamDecorator";
+import { Get, Post } from "../../request/createMethodDecorator";
+import { Body, Header, Param, Query } from "../../request/createParamDecorator";
 import { UserService } from "../services/UserService";
 
 

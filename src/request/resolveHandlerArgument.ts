@@ -1,4 +1,4 @@
-import { Constructor } from './container';
+import { Constructor } from '../container';
 import { ParamMetadata, paramRegistry } from './paramRegistry';
 
 interface RequestContext {

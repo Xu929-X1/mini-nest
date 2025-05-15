@@ -1,4 +1,4 @@
-import { Interceptor } from '../../interceptor';
+import { Interceptor } from '../../request/interceptor';
 
 export class LoggerInterceptor implements Interceptor {
     async intercept(next: () => Promise<any>) {

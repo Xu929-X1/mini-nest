@@ -1,4 +1,4 @@
-import { Constructor } from './container';
+import { Constructor } from '../container';
 import { RouteRecord, routeRegistryTrie } from './routeRegistry';
 import { ParamMetadata, paramRegistry } from './paramRegistry';
 import {

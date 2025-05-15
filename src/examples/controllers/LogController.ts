@@ -1,6 +1,6 @@
 import { Controller } from '../../controller';
-import { Get } from '../../createMethodDecorator';
-import { UseInterceptor } from '../../interceptor';
+import { Get } from '../../request/createMethodDecorator';
+import { UseInterceptor } from '../../request/interceptor';
 import { LoggerInterceptor } from '../interceptors/LoggerInterceptor';
 
 @Controller('/log')

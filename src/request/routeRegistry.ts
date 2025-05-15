@@ -1,4 +1,4 @@
-import { Constructor } from "./container";
+import { Constructor } from "../container";
 import { classInterceptors, Interceptor, methodInterceptors } from "./interceptor";
 
 export type RouteRecord = {

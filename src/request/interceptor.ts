@@ -1,4 +1,4 @@
-import { Constructor } from "./container";
+import { Constructor } from "../container";
 export interface Interceptor {
     intercept(next: () => Promise<any> | any): Promise<any> | any;
 }
