@@ -11,10 +11,10 @@
   "description": "",
   "dependencies": {
     "reflect-metadata": "^0.2.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
   "devDependencies": {
-    "@types/node": "^24.0.7",
+    "@types/node": "^24.2.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3"
   }
