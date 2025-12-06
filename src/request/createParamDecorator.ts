@@ -1,11 +1,20 @@
 import { Constructor } from "../container";
 import { ParamMetadata, paramRegistry } from "./paramRegistry";
-
+import "reflect-metadata";
 
 function registerParam(target: Object, propertyKey: string | symbol | undefined, meta: ParamMetadata) {
     const controller = target.constructor;
-
     const methodName = propertyKey?.toString() || "";
+    //collect type info, use this later in apply default casting
+    const type = Reflect.getMetadata("design:paramtypes", target, propertyKey!) as any[];
+    if (type && type[meta.index]) {
+        meta.type = {
+            name: type[meta.index]?.name,
+            raw: type[meta.index],
+            isPrimitive: [String, Number, Boolean].includes(type[meta.index]),
+            isArray: type[meta.index] === Array,
+        };
+    }
     if (!paramRegistry.has(controller as Constructor<any>)) {
         paramRegistry.set(controller as Constructor<any>, new Map<string, ParamMetadata[]>());
     }
@@ -30,6 +39,7 @@ function createMethodDecorator(key: ParamMetadata['source']): (paramKey: string)
             if (['param', 'query', 'header'].includes(key) && !paramKey) {
                 throw new Error(`@${key}() requires a key (e.g. @${key}('id'))`);
             }
+
             const paramMetadata: ParamMetadata = {
                 index: parameterIndex,
                 source: key as ParamMetadata["source"],
