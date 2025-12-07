@@ -47,6 +47,7 @@ function runValidation(value: any, rule: Validator | ValidatorRule[]): boolean {
 }
 
 function applyDefaultAndCast(value: any, type: TypeInfo) {
+    console.log("[applyDefaultAndCast] value:", value, " type:", type);
     if (value == null || value == undefined) {
         if (type.default != null) {
             return type.default;
@@ -61,6 +62,9 @@ function applyDefaultAndCast(value: any, type: TypeInfo) {
             return String(value);
         }
         if (type.raw === Number) {
+            if(isNaN(Number(value))) {
+                throw new Error(`Cannot cast value '${value}' to Number`);
+            }
             return Number(value);
         }
         if (type.raw === Boolean) {
@@ -81,7 +85,7 @@ export function resolveHandlerArguments(
     const args: any[] = [];
 
     for (const meta of methodParams) {
-        const type = meta.type?.raw;
+        const type = meta.type;
         let value: any = undefined;
 
         switch (meta.source) {
