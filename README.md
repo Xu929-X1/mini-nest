@@ -35,11 +35,27 @@ Examples are in example directory, if you want, for example, run user service/co
 node dist/examples/user.example.js
 ```
 
+or use ts-node to run all examples directly: 
+
+```bash
+ts-node src/main.ts
+```
+
+I have a script defined already, this is equivalent to the previous command: 
+
+```bash
+npm run dev
+```
+
 ## 🔍 Roadmap
  
-- Route parameters: /users/:id
+- Route parameters: /users/:id ✅
 
-- Request body decorators (@Body())
+- Request body decorators (@Body()) ✅
+
+- Parameter validation ✅
+
+- Validation Pipeline
 
 - Guards / Interceptors / Middleware
 
