@@ -1,6 +1,7 @@
 import { Constructor } from "../container";
 import { ParamMetadata, paramRegistry } from "./paramRegistry";
 import "reflect-metadata";
+import { RuleBuilder, Validator } from "./validation/rule";
 
 function registerParam(target: Object, propertyKey: string | symbol | undefined, meta: ParamMetadata) {
     const controller = target.constructor;
@@ -31,19 +32,33 @@ function registerParam(target: Object, propertyKey: string | symbol | undefined,
     }
 }
 
+type ParamOptions = {
+    key?: string,
+    validator?: RuleBuilder | Validator
+}
 
-function createMethodDecorator(key: ParamMetadata['source']): (paramKey: string) => ParameterDecorator {
-    return function (paramKey?: string) {
+function createMethodDecorator(source: ParamMetadata['source']): (paramKeyOrOption: string | ParamOptions) => ParameterDecorator {
+    return function (paramKeyOrOption?: string | ParamOptions) {
         return function (target: Object, propertyKey: string | symbol | undefined, parameterIndex: number) {
             //body does not require a key, but others do
-            if (['param', 'query', 'header'].includes(key) && !paramKey) {
+            let key: string | undefined;
+            let validator: RuleBuilder | Validator | undefined;
+            if (typeof paramKeyOrOption === 'string') {
+                key = paramKeyOrOption;
+            } else if (typeof paramKeyOrOption === 'object' && paramKeyOrOption !== null) {
+                key = paramKeyOrOption.key;
+                validator = paramKeyOrOption.validator;
+            }
+
+            if (['param', 'query', 'header'].includes(source) && !key) {
                 throw new Error(`@${key}() requires a key (e.g. @${key}('id'))`);
             }
 
             const paramMetadata: ParamMetadata = {
                 index: parameterIndex,
-                source: key as ParamMetadata["source"],
-                key: paramKey,
+                source: source as ParamMetadata["source"],
+                key: key,
+                validator: validator,
             };
             registerParam(target, propertyKey, paramMetadata);
         };

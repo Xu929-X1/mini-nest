@@ -87,7 +87,7 @@ export function resolveHandlerArguments(
     for (const meta of methodParams) {
         const type = meta.type;
         let value: any = undefined;
-
+        console.log("[resolveHandlerArguments] Resolving param:", meta);
         switch (meta.source) {
             case 'param':
                 value = meta.key ? req.params?.[meta.key] : req.params;

@@ -10,10 +10,10 @@ export type ValidatorRule = {
     type: "required"
 } | {
     type: "minLength",
-    value: string
+    value: number
 } | {
     type: "maxLength",
-    value: string
+    value: number
 } | {
     type: "pattern",
     value: RegExp
@@ -40,12 +40,12 @@ export class RuleBuilder {
         return this;
     }
 
-    minLength(value: string) {
+    minLength(value: number) {
         this.rules.push({ type: "minLength", value });
         return this;
     }
 
-    maxLength(value: string) {
+    maxLength(value: number) {
         this.rules.push({ type: "maxLength", value });
         return this;
     }

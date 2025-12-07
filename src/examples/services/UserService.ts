@@ -25,4 +25,9 @@ export class UserService {
         return { id, name, expand, token };
     }
 
+    createUserSimple(name: string) {
+        this.logger.log(`Creating user with name: ${name}`);
+        return { name };
+    }
+
 }

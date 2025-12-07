@@ -1,6 +1,7 @@
 import { Controller } from "../../controller";
 import { Get, Post } from "../../request/createMethodDecorator";
 import { Body, Header, Param, Query } from "../../request/createParamDecorator";
+import { rule } from "../../request/validation/rule";
 import { UserService } from "../services/UserService";
 
 
@@ -26,7 +27,10 @@ export class UserController {
     createUser(
         @Param('id') id: number,
         @Query('expand') expand: string,
-        @Body('name') name: string,
+        @Body({
+            key: 'name',
+            validator: rule().required().minLength(3).maxLength(50)
+        }) name: string,
         @Header('authorization') token: string
     ) {
         console.log('Injected parameters:', { id, expand, name, token });
