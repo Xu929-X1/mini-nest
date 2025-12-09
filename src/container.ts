@@ -1,3 +1,5 @@
+import { OnDestroy, OnInit } from "./lifecycle";
+
 export interface Constructor<T = any> extends Function {
     new(...args: any[]): T;
 }
@@ -6,6 +8,8 @@ class Container {
     private container = new Map<Constructor, any>();
     // dep map
     private depMap = new Map<Constructor, Constructor[]>();
+
+    private readonly instances = new Set<any>();
     constructor() {
     }
 
@@ -25,6 +29,12 @@ class Container {
             const injections = deps.map((param: Constructor) => this.resolve(param));
             const newInstance = new token(...injections);
             this.container.set(token, newInstance);
+            this.instances.add(newInstance);
+
+            const maybeInit = newInstance as unknown as OnInit;
+            if (maybeInit && typeof maybeInit.onModuleInit === 'function') {
+                maybeInit.onModuleInit();
+            }
 
             return newInstance;
         } catch (error) {
@@ -32,6 +42,15 @@ class Container {
             throw new Error(`Error resolving ${token.name}: ${error}`);
         }
 
+    }
+
+    async shutdown(): Promise<void> {
+        for (const instance of this.instances) {
+            const maybeDestroy = instance as unknown as OnDestroy;
+            if (maybeDestroy && typeof maybeDestroy.onModuleDestroy === 'function') {
+                await maybeDestroy.onModuleDestroy();
+            }
+        }   
     }
 }
 
