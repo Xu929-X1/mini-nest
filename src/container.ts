@@ -3,19 +3,22 @@ import { OnDestroy, OnInit } from "./lifecycle";
 export interface Constructor<T = any> extends Function {
     new(...args: any[]): T;
 }
-class Container {
+export class Container {
     // DI container
     private container = new Map<Constructor, any>();
     // dep map
     private depMap = new Map<Constructor, Constructor[]>();
-
     private readonly instances = new Set<any>();
-    private static created: boolean = false;
-    constructor() {
-        if (Container.created) {
-            throw new Error("Container is a singleton class and has already been instantiated.");
+    private static _containerInstance: Container;
+
+    private constructor() {
+
+    }
+    static get instance(): Container {
+        if (!this._containerInstance) {
+            this._containerInstance = new Container();
         }
-        Container.created = true;
+        return this._containerInstance;
     }
 
     register(token: Constructor, deps?: Constructor[]): void {
@@ -57,5 +60,3 @@ class Container {
         }
     }
 }
-
-export const container = new Container(); 

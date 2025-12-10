@@ -1,7 +1,7 @@
-import { container } from "../container";
+import { Container } from "../container";
 
 class App {
-    private readonly container = container;
+    private readonly container = Container.instance;
 
 
 }
