@@ -55,6 +55,10 @@ npm run dev
 
 - Parameter validation ✅
 
+- Life cycle hooks (WIP)
+
+- Exception Filter (WIP)
+
 - Validation Pipeline
 
 - Guards / Interceptors / Middleware

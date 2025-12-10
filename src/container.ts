@@ -10,7 +10,12 @@ class Container {
     private depMap = new Map<Constructor, Constructor[]>();
 
     private readonly instances = new Set<any>();
+    private static created: boolean = false;
     constructor() {
+        if (Container.created) {
+            throw new Error("Container is a singleton class and has already been instantiated.");
+        }
+        Container.created = true;
     }
 
     register(token: Constructor, deps?: Constructor[]): void {
@@ -38,7 +43,6 @@ class Container {
 
             return newInstance;
         } catch (error) {
-
             throw new Error(`Error resolving ${token.name}: ${error}`);
         }
 
@@ -50,7 +54,7 @@ class Container {
             if (maybeDestroy && typeof maybeDestroy.onModuleDestroy === 'function') {
                 await maybeDestroy.onModuleDestroy();
             }
-        }   
+        }
     }
 }
 
