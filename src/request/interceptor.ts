@@ -1,4 +1,4 @@
-import { Constructor } from "../container";
+import { Constructor, Container } from "../container";
 export interface Interceptor {
     intercept(next: () => Promise<any> | any): Promise<any> | any;
 }
@@ -36,7 +36,7 @@ export function applyInterceptors(interceptors: Constructor<Interceptor>[], next
     if (interceptors.length === 0) return next();
     const interceptor = interceptors[0];
     const rest = interceptors.slice(1);
-    const instance = new interceptor();
+    const instance = Container.instance.resolve<Interceptor>(interceptor);
     return Promise.resolve(
         instance.intercept(() => applyInterceptors(rest, next))
     );

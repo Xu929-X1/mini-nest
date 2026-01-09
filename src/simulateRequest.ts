@@ -1,5 +1,5 @@
 import { match } from "assert";
-import { container } from "./container";
+import { Container } from "./container";
 import { HttpMethod } from "./request/createMethodDecorator";
 import { applyInterceptors, classInterceptors } from "./request/interceptor";
 import { resolveHandlerArguments } from "./request/resolveHandlerArgument";
@@ -20,6 +20,7 @@ function parseQuery(url: string): Record<string, string> {
 export async function simulateRequest(url: string, method: HttpMethod, options?: {
     body?: any; headers?: Record<string, string>
 }) {
+    const container = Container.instance;
     url = normalizeUrl(url);
     const matchingRoute = routeRegistryTrie.findRoute(method, url);
     const rawQuery = parseQuery(url);

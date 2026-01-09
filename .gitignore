@@ -28,3 +28,9 @@ build/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# ZIP files
+*.zip
+*.tar.gz
+*.rar
+*.7z

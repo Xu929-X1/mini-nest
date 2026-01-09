@@ -28,7 +28,7 @@ export class Container {
     }
 
     // resolve a token, if it is not in the container, create a new instance and store it in the container
-    resolve<T>(token: Constructor<T>): T {
+    resolve<T>(token: Constructor<T>, context?: any): T {
         if (this.container.has(token)) {
             return this.container.get(token) as T;
         }
@@ -59,4 +59,5 @@ export class Container {
             }
         }
     }
+
 }
