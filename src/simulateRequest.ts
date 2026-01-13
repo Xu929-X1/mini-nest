@@ -1,9 +1,8 @@
-import { match } from "assert";
 import { Container } from "./container";
 import { HttpMethod } from "./request/createMethodDecorator";
-import { applyInterceptors, classInterceptors } from "./request/interceptor";
+import { applyInterceptors } from "./request/interceptor";
 import { resolveHandlerArguments } from "./request/resolveHandlerArgument";
-import { RouteRecord, routeRegistryTrie, RouteTrieNode } from "./request/routeRegistry";
+import { RouteRecord, routeRegistryTrie } from "./request/routeRegistry";
 import { normalizeUrl } from "./request/utils/normalizePath";
 
 function parseQuery(url: string): Record<string, string> {

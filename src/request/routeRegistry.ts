@@ -1,5 +1,6 @@
 import { Constructor } from "../container";
 import { classInterceptors, Interceptor, methodInterceptors } from "./interceptor";
+import { normalizeUrl } from "./utils/normalizePath";
 
 export type RouteRecord = {
     method: string;
@@ -51,8 +52,8 @@ class TrieRoute {
         currentNode.handler = route;
     }
 
-    findRoute(method: HttpMethod, url: string): { route: RouteRecord | undefined, params: Record<string, string> } | undefined {
-        const cleanPath = url.split('?')[0];
+    findRoute(method: HttpMethod, url: string): { route: RouteRecord, params: Record<string, string> } | undefined {
+        const cleanPath = normalizeUrl(url).split('?')[0];
         const segments = cleanPath.split('/').filter(Boolean);
         let currentNode: RouteTrieNode | undefined = this.root.get(method);
         if (!currentNode) {
