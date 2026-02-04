@@ -23,7 +23,7 @@ import { Middleware } from "./type";
 
 export const middlewareRegistry = new MiddlewareRegistry();
 
-export async function runMiddleware(middlewares: Middleware[], req: Request) {
+export async function runMiddleware(middlewares: Middleware[], req: Request, res: Response) {
     let index = -1;
     async function dispatch(i: number): Promise<void> {
         if (i <= index) {
@@ -34,7 +34,7 @@ export async function runMiddleware(middlewares: Middleware[], req: Request) {
         const currentMiddleware = middlewares[i];
 
         if (currentMiddleware) {
-            await currentMiddleware(req, {} as Response, () => dispatch(i + 1));
+            await currentMiddleware(req, res, () => dispatch(i + 1));
         } else {
             return;
         }
