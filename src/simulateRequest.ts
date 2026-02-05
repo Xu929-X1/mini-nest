@@ -3,7 +3,6 @@ import { HttpMethod } from "./request/createMethodDecorator";
 import { applyInterceptors } from "./request/interceptor";
 import { resolveHandlerArguments } from "./request/resolveHandlerArgument";
 import { RouteRecord, routeRegistryTrie } from "./request/routeRegistry";
-import { normalizeUrl } from "./request/utils/normalizePath";
 
 function parseQuery(url: string): Record<string, string> {
     const dummyUrl = new URL('http://dummy' + url);
@@ -20,7 +19,6 @@ export async function simulateRequest(url: string, method: HttpMethod, options?:
     body?: any; headers?: Record<string, string>
 }) {
     const container = Container.instance;
-    url = normalizeUrl(url);
     const matchingRoute = routeRegistryTrie.findRoute(method, url);
     const rawQuery = parseQuery(url);
     if (!matchingRoute) {

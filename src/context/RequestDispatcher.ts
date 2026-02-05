@@ -2,7 +2,7 @@ import { Container } from "../container";
 import { HttpMethod } from "../request/createMethodDecorator";
 import { middlewareRegistry, runMiddleware } from "../request/middleware/middleware";
 import { routeRegistryTrie } from "../request/routeRegistry";
-import { normalizeUrl } from "../request/utils/normalizePath";
+import { normalizeUrl } from "../request/http/normalizePath";
 import { ExecutionContext } from "./ExecutionContext";
 
 /**

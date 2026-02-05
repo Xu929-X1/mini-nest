@@ -1,6 +1,6 @@
 import { Constructor } from "../container";
 import { classInterceptors, Interceptor, methodInterceptors } from "./interceptor";
-import { normalizeUrl } from "./utils/normalizePath";
+import { normalizeUrl } from "./http/normalizePath";
 
 export type RouteRecord = {
     method: string;
