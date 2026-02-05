@@ -1,7 +1,7 @@
 import { Constructor } from "../container";
+import { HttpMethod } from "./http/httpRequest";
 import { metadata } from "./metadata";
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 function createMethodDecorator(method: HttpMethod) {
     return function (url: string) {
         return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {

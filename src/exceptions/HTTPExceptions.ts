@@ -59,7 +59,7 @@ export class ValidationException extends BaseHTTPException {
         super(message, 422, 'Validation Error');
     }
 
-    override get getResponse(): ValidationExceptionResponse {
+    override getResponse(): ValidationExceptionResponse {
         return {
             statusCode: this.statusCode,
             message: this.message,

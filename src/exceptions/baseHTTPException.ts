@@ -13,7 +13,7 @@ export class BaseHTTPException extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 
-    get getResponse(): HttpExceptionResponse {
+    getResponse(): HttpExceptionResponse {
         return {
             statusCode: this.statusCode,
             message: this.message,
@@ -21,7 +21,7 @@ export class BaseHTTPException extends Error {
         }
     }
 
-    get getStatus() {
+    getStatus() {
         return this.statusCode;
     }
 }

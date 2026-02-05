@@ -4,18 +4,27 @@ import { HttpResponse } from "../request/http/httpResponse";
 import { DefaultExceptionFilter } from "./defaultExceptionFilter";
 import { ExceptionFilter } from "./exceptionFilter";
 
+interface FilterRegistration {
+    filter: ExceptionFilter;
+    order: number;
+}
+
 //TODO: Improve Exception Handler to support async filters and filter chaining
 export class ExceptionHandler {
-    private filters: ExceptionFilter[] = [];
+    private filters: FilterRegistration[] = [];
     private defaultFilter = new DefaultExceptionFilter();
 
-    registerFilter(filter: ExceptionFilter) {
-        this.filters.push(filter);
+    registerFilter(filter: ExceptionFilter, order: number) {
+        this.filters.push({ filter, order });
+        this.filters.sort((a, b) => a.order - b.order);
     }
 
     async handleException(exception: unknown, context: ExecutionContext): Promise<HttpResponse> {
         const response = new HttpResponse();
-        for (const filter of this.filters) {
+        for (const { filter } of this.filters) {
+            if (filter.canHandle && !filter.canHandle(exception)) {
+                continue;
+            }
             try {
                 await filter.catch(exception, context);
                 return response;

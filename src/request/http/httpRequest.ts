@@ -96,7 +96,7 @@ export class HttpRequest {
         return { ...this._params };
     }
 
-    set setParams(params: Record<string, string>) {
+    setParams(params: Record<string, string>) {
         this._params = params;
     }
 

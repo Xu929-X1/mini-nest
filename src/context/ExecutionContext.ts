@@ -1,5 +1,5 @@
 import { Constructor, Container } from "../container";
-import { HttpMethod } from "../request/createMethodDecorator";
+import { HttpMethod } from "../request/http/httpRequest";
 /**
  * This is the place where all the getters lives 
  */

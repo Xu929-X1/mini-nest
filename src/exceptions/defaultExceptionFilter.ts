@@ -17,9 +17,14 @@ export class DefaultExceptionFilter implements ExceptionFilter<any> {
 
     }
 
+    //by design this filter can handle any exception
+    canHandle(_: unknown): boolean {
+        return true;
+    }
+
 
     private handleHttpException(exception: BaseHTTPException, response: HttpResponse, context: ExecutionContext) {
-        const exceptionResponse = exception.getResponse;
+        const exceptionResponse = exception.getResponse();
         const request = context.getRequest();
         const errorResponse = {
             ...exceptionResponse,
@@ -68,7 +73,7 @@ export class DefaultExceptionFilter implements ExceptionFilter<any> {
         };
         response.status(500).json(errorResponse);
         Log.error(
-            `[Unhandled Exception:] 500 Unknown error on ${request.method} ${request.path}`,
+            `[Unhandled Critical Exception:] Unknown error on ${request.method} ${request.path}, it is more likely the framework's fault than yours.` ,
             JSON.stringify(cause)
         );
     }
