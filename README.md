@@ -57,11 +57,11 @@ npm run dev
 
 - Life cycle hooks (WIP)
 
-- Exception Filter (WIP)
+- Exception Filter ✅
 
 - Validation Pipeline
 
-- Guards / Interceptors / Middleware
+- Guards / Interceptors / Middleware (WIP)
 
 - Module organization (@Module)
 
