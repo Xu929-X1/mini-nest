@@ -71,21 +71,124 @@ npm run dev
 
 This is a server-side framework designed to help developers handle API requests in a structured and elegant way. From that perspective, understanding the lifecycle of a request is essential to grasp how the project is architected.
 
+### 🥾 Bootstrap 
+
+**Bootstrap** is the process of initializing the framework, registering metadata,
+and preparing the runtime environment **before any request is handled**.
+
+At the end of bootstrap, the application reaches a **stable state** where:
+- Routes are registered
+- Controllers and dependencies are instantiated
+- Global middleware / interceptors / guards are ready
+- The HTTP server is listening for incoming requests
+
+
+## High-Level Flow
+
+```text
+Create Application
+  ↓
+Load Modules & Metadata
+  ↓
+Instantiate Controllers & Providers
+  ↓
+Register Routes
+  ↓
+Initialize Global Pipeline
+  ↓
+Start HTTP Server
+```
+
 ### Request Life Cycle     
 
-A request begins in simulateRequest (for now), which serves as the entry point of the framework. The following steps occur in order:
+When a request enters this framework, this is what will happen: 
 
-1. Route lookup: The framework looks up the appropriate handler in the routeRegistry based on HTTP method and URL.
+---
 
-2. Controller instantiation: It creates a controller instance using the DI container, resolving any constructor dependencies automatically.
+### Phase 1: Request parsing and route matching
 
-3. Parameter injection: It collects metadata from the paramRegistry and resolves the parameters (e.g., from body, query, params, headers) to inject into the handler.
+- HTTP request enters the framework, the framework receives the request as:
+    - Raw HTTP request (method, headers, url, body)
 
-4. Handler execution: It calls the controller method with the resolved arguments.
+- URL parsing and normalization
+    - The framework parses the URL and extracts **path** and **query parameters**
+    - Request headers are normalized (header keys are converted to lower case)
 
-5. Business logic: Finally, control is handed over to the logic the user has written inside the handler method.
+- Route matching
+    - The framework looks up the route registry using **method + path**
+    - The corresponding route handler and its metadata are resolved
+    - If no route is matched, the request is terminated with a `NotFound` error
 
-This flow mimics the core behavior of frameworks like NestJS, but with a minimal and transparent implementation.
+---
+
+### Phase 2: Execution context preparation and pre-processing
+
+- Execution context creation
+    - An execution context is created for the current request
+    - The context contains:
+        - Request and response objects
+        - Matched route information
+        - Controller instance and handler reference
+        - Parameter and metadata definitions
+
+- Guards (authorization / access control)
+    - Guards are executed to determine whether the request is allowed to proceed
+    - If any guard denies the request, execution stops immediately
+
+- Parameter resolution
+    - Handler parameters are resolved from the execution context
+    - Supported parameter sources include:
+        - Path parameters
+        - Query parameters
+        - Request body
+        - Headers
+
+- Pipes (transformation and validation)
+    - Resolved parameters are passed through pipes
+    - Pipes may transform or validate parameter values
+    - If a pipe throws an error, request execution is terminated
+
+---
+
+### Phase 3: Handler execution and interception
+
+- Interceptors (before execution)
+    - Interceptors are invoked before the handler is executed
+    - Interceptors may perform:
+        - Logging
+        - Timing
+        - Context modification
+        - Result wrapping
+
+- Handler execution
+    - The matched controller method is executed with resolved parameters
+    - The handler may return a value synchronously or asynchronously
+
+- Interceptors (after execution)
+    - Interceptors process the handler’s return value
+    - The result may be transformed or wrapped before being sent
+
+---
+
+### Phase 4: Response mapping and completion
+
+- Response mapping
+    - The final result is mapped to an HTTP response
+    - Status code, headers, and response body are resolved by the framework
+
+- Response sent
+    - The HTTP response is sent back to the client
+    - The request life cycle ends
+
+---
+
+### Error handling
+
+- Errors may be thrown at any phase of the request lifecycle
+- Thrown errors are captured and handled by the framework’s error handling layer
+- Errors are converted into appropriate HTTP responses
+
+
 
 
 ## Credits
