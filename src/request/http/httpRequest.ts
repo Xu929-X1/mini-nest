@@ -45,7 +45,7 @@ export class HttpRequest {
      * @param path 
      * @returns Normalized path string
      */
-    private normalizePath(path: string): string {
+    public normalizePath(path: string): string {
         if (!path) return "/";
         if (!path.startsWith('/')) path = '/' + path;
         if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
