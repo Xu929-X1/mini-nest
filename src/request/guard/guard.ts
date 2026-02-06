@@ -1,5 +1,5 @@
 import { Constructor } from "../../container";
-import { ExecutionContext } from "../../context/ExecutionContext";
+import { ExecutionContext } from "../../core/ExecutionContext";
 type ClassOrPrototype = Constructor | Record<string, any>;
 export const classGuards = new Map<Constructor, Guard[]>();
 export const methodGuards = new Map<Constructor, Map<string, Guard[]>>();
@@ -22,5 +22,5 @@ export function UseGuard(guards: Array<Guard>) {
             Reflect.defineMetadata('guards', guards, target);
         }
     }
-    
+
 }

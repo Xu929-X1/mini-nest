@@ -1,4 +1,4 @@
-import { ExecutionContext } from "../context/ExecutionContext";
+import { ExecutionContext } from "../core/ExecutionContext";
 import { Log } from "../log/log";
 import { HttpResponse } from "../request/http/httpResponse";
 import { DefaultExceptionFilter } from "./defaultExceptionFilter";

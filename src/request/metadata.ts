@@ -1,26 +1,26 @@
 import { Constructor } from '../container';
-import { RouteRecord, routeRegistryTrie } from './routeRegistry';
+import { RouteMetadataType, routeRegistryTrie } from './routeRegistry';
 import { ParamMetadata, paramRegistry } from './paramRegistry';
 import {
   Interceptor,
   classInterceptors,
   methodInterceptors,
 } from './interceptor';
-import { HttpMethod } from './createMethodDecorator';
-const routeMetaData = new Map<Constructor, RouteRecord[]>();
+import { HttpMethod } from './http/httpRequest';
+const routeMetaData = new Map<Constructor, RouteMetadataType[]>();
 export const metadata = {
   // 🟦 Route Metadata
-  getRoute(method: HttpMethod, url: string): RouteRecord | undefined {
+  getRoute(method: HttpMethod, url: string): RouteMetadataType | undefined {
     return routeRegistryTrie.findRoute(method, url)?.route;
   },
 
-  registerRoute(route: RouteRecord) {
+  registerRoute(route: RouteMetadataType) {
     routeRegistryTrie.addRoute(route.method as HttpMethod, route);
   },
 
   registerRouteOnMethodDecoratorLoad(controller: Constructor, url: string, method: HttpMethod, handlerName: string) {
     const route = routeMetaData.get(controller) || [];
-    const newRoute: RouteRecord = {
+    const newRoute: RouteMetadataType = {
       method,
       url,
       handlerName,
