@@ -39,17 +39,20 @@ export class HttpRequest {
 
         return { path, query };
     }
+    static normalizePath(path: string): string {
+        if (!path) return "/";
+        if (!path.startsWith('/')) path = '/' + path;
+        if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+        return path;
+    }
 
     /**
      * Normalizes a path string by ensuring it starts with a forward slash and does not end with one.
      * @param path 
      * @returns Normalized path string
      */
-    public normalizePath(path: string): string {
-        if (!path) return "/";
-        if (!path.startsWith('/')) path = '/' + path;
-        if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
-        return path;
+    private normalizePath(path: string): string {
+        return HttpRequest.normalizePath(path);
     }
 
     /**

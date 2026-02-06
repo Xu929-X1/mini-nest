@@ -55,7 +55,7 @@ class TrieRoute {
     }
 
     findRoute(method: HttpMethod, url: string): { route: RouteMetadataType, params: Record<string, string> } | undefined {
-        const cleanPath = HttpRequest.prototype.normalizePath(url.split('?')[0]);
+        const cleanPath = HttpRequest.normalizePath(url.split('?')[0]);
         const segments = cleanPath.split('/').filter(Boolean);
         let currentNode: RouteTrieNode | undefined = this.root.get(method);
         if (!currentNode) {
