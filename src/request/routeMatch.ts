@@ -1,3 +1,5 @@
+import { Log } from "../log/log";
+
 export function routeMatch(routePattern: string, path: string) {
     const routeParts = routePattern.split('/').filter(Boolean);
     const pathParts = path.split('/').filter(Boolean);
@@ -19,7 +21,7 @@ export function routeMatch(routePattern: string, path: string) {
             return { matched: false };
         }
     }
-    console.log('Route matched:', routePattern, '→', path, 'with params:', params);
+    Log.info(`Route matched: ${routePattern} → ${path} with params: ${JSON.stringify(params)}`);
     return { matched: true, params };
 
 }

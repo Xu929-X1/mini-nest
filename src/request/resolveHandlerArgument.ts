@@ -1,4 +1,5 @@
 import { Constructor } from '../container';
+import { Log } from '../log/log';
 import { ParamMetadata, paramRegistry, TypeInfo } from './paramRegistry';
 import { RuleBuilder, Validator, ValidatorRule } from './validation/rule';
 
@@ -47,7 +48,7 @@ function runValidation(value: any, rule: Validator | ValidatorRule[]): boolean {
 }
 
 function applyDefaultAndCast(value: any, type: TypeInfo) {
-    console.log("[applyDefaultAndCast] value:", value, " type:", type);
+    Log.info(`[applyDefaultAndCast] value: ${value}, type: ${JSON.stringify(type)}`);
     if (value == null || value == undefined) {
         if (type.default != null) {
             return type.default;
@@ -62,7 +63,7 @@ function applyDefaultAndCast(value: any, type: TypeInfo) {
             return String(value);
         }
         if (type.raw === Number) {
-            if(isNaN(Number(value))) {
+            if (isNaN(Number(value))) {
                 throw new Error(`Cannot cast value '${value}' to Number`);
             }
             return Number(value);
@@ -87,7 +88,7 @@ export function resolveHandlerArguments(
     for (const meta of methodParams) {
         const type = meta.type;
         let value: any = undefined;
-        console.log("[resolveHandlerArguments] Resolving param:", meta);
+        Log.info(`[resolveHandlerArguments] Resolving param: ${meta.key || meta.index}`);
         switch (meta.source) {
             case 'param':
                 value = meta.key ? req.params?.[meta.key] : req.params;

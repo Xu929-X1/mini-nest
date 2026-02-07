@@ -2,6 +2,8 @@ import { Constructor } from "../container";
 import { HttpMethod } from "./http/httpRequest";
 import { metadata } from "./metadata";
 
+const httpMethods: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'];
+
 function createMethodDecorator(method: HttpMethod) {
     return function (url: string) {
         return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
@@ -13,10 +15,11 @@ function createMethodDecorator(method: HttpMethod) {
 }
 
 
-const Get = createMethodDecorator('GET');
-const Post = createMethodDecorator('POST');
-const Put = createMethodDecorator('PUT');
-const Delete = createMethodDecorator('DELETE');
-const Patch = createMethodDecorator('PATCH');
+export const Get = createMethodDecorator('GET');
+export const Post = createMethodDecorator('POST');  
+export const Put = createMethodDecorator('PUT');
+export const Delete = createMethodDecorator('DELETE');
+export const Patch = createMethodDecorator('PATCH');
+export const Options = createMethodDecorator('OPTIONS');
+export const Head = createMethodDecorator('HEAD');
 
-export { Get, Post, Put, Delete, Patch };

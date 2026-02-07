@@ -1,6 +1,6 @@
 import { Constructor, Container } from "../container";
 export interface Interceptor {
-    intercept(next: () => Promise<any> | any): Promise<any> | any;
+    intercept(next: () => Promise<unknown> | unknown): Promise<unknown> | unknown;
 }
 type MethodInterceptorMap = Map<string, Constructor<Interceptor>[]>;
 
@@ -32,14 +32,19 @@ export function UseInterceptor(interceptor: Constructor<Interceptor>) {
         }
     };
 }
-export function applyInterceptors(interceptors: Constructor<Interceptor>[], next: () => Promise<any> | any) {
-    if (interceptors.length === 0) return next();
-    const interceptor = interceptors[0];
-    const rest = interceptors.slice(1);
-    const instance = Container.instance.resolve<Interceptor>(interceptor);
-    return Promise.resolve(
-        instance.intercept(() => applyInterceptors(rest, next))
-    );
+export function applyInterceptors(interceptors: Constructor<Interceptor>[], next: () => Promise<unknown> | unknown): Promise<unknown> {
+    if (interceptors.length === 0) return Promise.resolve(next());
+    try {
+
+        const interceptor = interceptors[0];
+        const rest = interceptors.slice(1);
+        const instance = Container.instance.resolve<Interceptor>(interceptor);
+        return Promise.resolve(
+            instance.intercept(() => applyInterceptors(rest, next))
+        );
+    } catch (err) {
+        return Promise.reject(err);
+    }
 }
 
 export function getClassInterceptors(controller: Constructor): Constructor<Interceptor>[] {

@@ -1,3 +1,5 @@
+import { ExecutionContext } from "./request/core/ExecutionContext";
+
 //module related stuff
 export interface OnInit {
     onModuleInit(): void | Promise<void>;
@@ -17,3 +19,15 @@ export interface OnAppShutdown {
     onAppShutdown(): void | Promise<void>;
 }
 
+//request lifecycle stuff
+export interface OnBeforeHandle {
+    onBeforeHandle(ctx: ExecutionContext): void | Promise<void>;
+}
+
+export interface OnAfterHandle {
+    onAfterHandle(ctx: ExecutionContext, result: unknown): void | Promise<void>;
+}
+
+export interface OnHandleError {
+    onHandleError(ctx: ExecutionContext, error: Error): void | Promise<void>;
+}

@@ -1,16 +1,17 @@
 import chalk from "chalk";
+import { TypeInfo } from "../request/paramRegistry";
 
 class Log {
     static error(msg: string, source?: string) {
-        console.error(chalk.blue(`[ERROR]${source ? ' [' + source + ']' : ''}`) + chalk.red(msg));
+        console.error(chalk.red(`[ERROR]${source ? ' [' + source + ']' : ''}\n`) + chalk.red(msg));
     }
 
     static info(msg: string, source?: string) {
-        console.log(chalk.blue(`[INFO]${source ? ' [' + source + ']' : ''}`) + chalk.green(msg));
+        console.log(chalk.green(`[INFO]${source ? ' [' + source + ']' : ''}`) + chalk.white(msg));
     }
 
     static warn(msg: string, source?: string) {
-        console.warn(chalk.blue(`[WARN]${source ? ' [' + source + ']' : ''}`) + chalk.yellow(msg));
+        console.warn(chalk.yellow(`[WARN]${source ? ' [' + source + ']' : ''}\n`) + chalk.yellow(msg));
     }
 }
 

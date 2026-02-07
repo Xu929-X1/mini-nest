@@ -1,4 +1,4 @@
-import { ExecutionContext } from "../core/ExecutionContext";
+import { ExecutionContext } from "../request/core/ExecutionContext";
 import { Log } from "../log/log";
 import { HttpResponse } from "../request/http/httpResponse";
 import { DefaultExceptionFilter } from "./defaultExceptionFilter";
@@ -20,7 +20,7 @@ export class ExceptionHandler {
     }
 
     async handleException(exception: unknown, context: ExecutionContext): Promise<HttpResponse> {
-        const response = new HttpResponse();
+        const response = context.getResponse();
         for (const { filter } of this.filters) {
             if (filter.canHandle && !filter.canHandle(exception)) {
                 continue;

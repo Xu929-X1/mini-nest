@@ -1,4 +1,4 @@
-import { ExecutionContext } from "../core/ExecutionContext";
+import { ExecutionContext } from "../request/core/ExecutionContext";
 import { Log } from "../log/log";
 import { HttpResponse } from "../request/http/httpResponse";
 import { BaseHTTPException } from "./baseHTTPException";
@@ -6,7 +6,7 @@ import { ExceptionFilter } from "./exceptionFilter";
 
 export class DefaultExceptionFilter implements ExceptionFilter<any> {
     catch(exception: unknown, context: ExecutionContext): void {
-        const response = new HttpResponse();
+        const response = context.getResponse();
         if (exception instanceof BaseHTTPException) {
             this.handleHttpException(exception, response, context);
         } else if (exception instanceof Error) {

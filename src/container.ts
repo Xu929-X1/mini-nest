@@ -1,3 +1,4 @@
+import { ExecutionContext } from "./request/core/ExecutionContext";
 import { OnDestroy, OnInit } from "./lifecycle";
 
 export interface Constructor<T = any> extends Function {
@@ -7,13 +8,10 @@ export class Container {
     // DI container
     private container = new Map<Constructor, any>();
     // dep map
-    private depMap = new Map<Constructor, Constructor[]>();
+    private depMapOverride = new Map<Constructor, Constructor[]>();
     private readonly instances = new Set<any>();
     private static _containerInstance: Container;
 
-    private constructor() {
-
-    }
     static get instance(): Container {
         if (!this._containerInstance) {
             this._containerInstance = new Container();
@@ -21,19 +19,20 @@ export class Container {
         return this._containerInstance;
     }
 
-    register(token: Constructor, deps?: Constructor[]): void {
+    // allow manual registration of dependencies, useful for testing and overriding dependencies
+    registerOverride(token: Constructor, deps?: Constructor[]): void {
         if (deps) {
-            this.depMap.set(token, deps);
+            this.depMapOverride.set(token, deps);
         }
     }
 
     // resolve a token, if it is not in the container, create a new instance and store it in the container
-    resolve<T>(token: Constructor<T>, context?: any): T {
+    resolve<T>(token: Constructor<T>, context?: ExecutionContext): T {
         if (this.container.has(token)) {
             return this.container.get(token) as T;
         }
         try {
-            const deps = this.depMap.get(token) || Reflect.getMetadata("design:paramtypes", token) || [];
+            const deps = this.depMapOverride.get(token) || Reflect.getMetadata("design:paramtypes", token) || [];
             const injections = deps.map((param: Constructor) => this.resolve(param));
             const newInstance = new token(...injections);
             this.container.set(token, newInstance);

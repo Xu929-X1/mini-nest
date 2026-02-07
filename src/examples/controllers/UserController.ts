@@ -1,13 +1,27 @@
+// src/examples/controllers/UserController.ts
 import { Controller } from "../../controller";
+import { ExecutionContext } from "../../request/core/ExecutionContext";
 import { Get, Post } from "../../request/createMethodDecorator";
 import { Body, Header, Param, Query } from "../../request/createParamDecorator";
 import { rule } from "../../request/validation/rule";
+import { OnBeforeHandle, OnAfterHandle, OnHandleError } from "../../lifecycle";
 import { UserService } from "../services/UserService";
 
-
 @Controller('/users')
-export class UserController {
+export class UserController implements OnBeforeHandle, OnAfterHandle, OnHandleError {
     constructor(private userService: UserService) { }
+
+    onBeforeHandle(ctx: ExecutionContext) {
+        console.log(`[UserController] onBeforeHandle: ${ctx.getRequest().method} ${ctx.getRequest().path}`);
+    }
+
+    onAfterHandle(ctx: ExecutionContext, result: unknown) {
+        console.log(`[UserController] onAfterHandle: result =`, result);
+    }
+
+    onHandleError(ctx: ExecutionContext, error: Error) {
+        console.log(`[UserController] onHandleError: ${error.message}`);
+    }
 
     @Get('/')
     getAll() {
@@ -33,7 +47,11 @@ export class UserController {
         }) name: string,
         @Header('authorization') token: string
     ) {
-        console.log('Injected parameters:', { id, expand, name, token });
         return this.userService.createUser(id, name, expand, token);
+    }
+
+    @Get('/error')
+    throwError() {
+        throw new Error('Test error from handler');
     }
 }

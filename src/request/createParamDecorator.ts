@@ -2,6 +2,7 @@ import { Constructor } from "../container";
 import { ParamMetadata, paramRegistry } from "./paramRegistry";
 import "reflect-metadata";
 import { RuleBuilder, Validator } from "./validation/rule";
+import { Log } from "../log/log";
 
 function registerParam(target: Object, propertyKey: string | symbol | undefined, meta: ParamMetadata) {
     const controller = target.constructor;
@@ -28,7 +29,7 @@ function registerParam(target: Object, propertyKey: string | symbol | undefined,
     existingParams[meta.index] = meta;
     // log out the param metadata for debugging
     if (process.env.NODE_ENV === "development") {
-        console.log(`[ParamRegistry] ${controller.name}.${methodName}(${meta.index}) ← ${meta.source}${meta.key ? `('${meta.key}')` : ''}`);
+        Log.info(`[ParamRegistry] ${controller.name}.${methodName}(${meta.index}) ← ${meta.source}${meta.key ? `('${meta.key}')` : ''}`);
     }
 }
 
