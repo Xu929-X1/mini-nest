@@ -2,6 +2,7 @@ import { HttpAdapter, RequestHandler } from "./httpAdapter";
 import express, { Express } from "express";
 import * as http from "http";
 import { HttpMethod } from "../../request/http/httpRequest";
+import { Log } from "../../log/log";
 export class ExpressAdapter implements HttpAdapter {
     private app: Express;
     private server: http.Server | null = null;
@@ -9,7 +10,7 @@ export class ExpressAdapter implements HttpAdapter {
     constructor(private handler: RequestHandler) {
         this.app = express();
         this.app.use(express.json());
-        
+
         this.app.use(async (req, res) => {
             const result = await this.handler({
                 method: req.method as HttpMethod,
@@ -33,7 +34,9 @@ export class ExpressAdapter implements HttpAdapter {
     async shutdown(): Promise<void> {
         return new Promise((resolve) => {
             if (this.server) {
-                this.server.close(() => resolve());
+                this.server.close(() => {
+                    resolve();
+                });
             } else {
                 resolve();
             }

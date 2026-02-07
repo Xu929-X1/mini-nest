@@ -1,4 +1,3 @@
-// src/examples/controllers/UserController.ts
 import { Controller } from "../../controller";
 import { ExecutionContext } from "../../request/core/ExecutionContext";
 import { Get, Post } from "../../request/createMethodDecorator";
@@ -6,25 +5,29 @@ import { Body, Header, Param, Query } from "../../request/createParamDecorator";
 import { rule } from "../../request/validation/rule";
 import { OnBeforeHandle, OnAfterHandle, OnHandleError } from "../../lifecycle";
 import { UserService } from "../services/UserService";
+import { Log } from "../../log/log";
+import { Injectable } from "../../injectable";
 
+@Injectable()
 @Controller('/users')
 export class UserController implements OnBeforeHandle, OnAfterHandle, OnHandleError {
     constructor(private userService: UserService) { }
 
     onBeforeHandle(ctx: ExecutionContext) {
-        console.log(`[UserController] onBeforeHandle: ${ctx.getRequest().method} ${ctx.getRequest().path}`);
+        Log.info(`[UserController] onBeforeHandle: ${ctx.getRequest().method} ${ctx.getRequest().path}`);
     }
 
     onAfterHandle(ctx: ExecutionContext, result: unknown) {
-        console.log(`[UserController] onAfterHandle: result =`, result);
+        Log.info(`[UserController] onAfterHandle: result = ${JSON.stringify(result)}`);
     }
 
     onHandleError(ctx: ExecutionContext, error: Error) {
-        console.log(`[UserController] onHandleError: ${error.message}`);
+        Log.error(`[UserController] onHandleError: ${error.message}`);
     }
 
     @Get('/')
     getAll() {
+        console.log(this.userService);
         return this.userService.getUsers();
     }
 

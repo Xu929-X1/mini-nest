@@ -19,8 +19,9 @@ export class App {
         this.container = Container.instance;
     };
 
-    async listen(port: number = 8080, cb: () => void = () => { }): Promise<void> {
+    async listen(cb: () => void = () => { }): Promise<void> {
         const requestPipeline = new RequestPipeline(Container.instance);
+        const port = this.options.port || 8080;
         switch (this.options.adapter) {
             case "express":
                 Log.info("Starting server with Express adapter...");
@@ -42,6 +43,7 @@ export class App {
     async shutdown(): Promise<void> {
         if (this.server) {
             await this.server.shutdown();
+            await this.container.shutdown();
         } else {
             throw new InternalServerErrorException("Server is not running");
         }

@@ -33,6 +33,8 @@ export class Container {
         }
         try {
             const deps = this.depMapOverride.get(token) || Reflect.getMetadata("design:paramtypes", token) || [];
+            console.log(`[Container] Resolving ${token.name}, deps:`, deps); // ← 加这个
+
             const injections = deps.map((param: Constructor) => this.resolve(param));
             const newInstance = new token(...injections);
             this.container.set(token, newInstance);

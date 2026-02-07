@@ -1,22 +1,25 @@
 import { Controller } from '../../controller';
+import { OnAppBootstrap, OnAppShutdown } from '../../lifecycle';
+import { Log } from '../../log/log';
 import { Get } from '../../request/createMethodDecorator';
 import { UseInterceptor } from '../../request/interceptor';
 import { LoggerInterceptor } from '../interceptors/LoggerInterceptor';
 
 @Controller('/log')
 @UseInterceptor(LoggerInterceptor)
-export class LogController {
-    onModuleInit() {
-        console.log('[LogController] onModuleInit called');
+export class LogController implements OnAppBootstrap, OnAppShutdown {
+    onAppBootstrap() {
+        Log.info('[LogController] Log controller has been initialized');
     }
+
 
     @Get('/test')
     test() {
-        console.log('[Handler] Executing');
+        Log.info('[Handler] Executing');
         return { ok: true };
     }
 
-    onModuleDestroy() {
-        console.log('[LogController] onModuleDestroy called');
+    onAppShutdown() {
+        Log.info('[LogController] Log controller is shutting down');
     }
 }

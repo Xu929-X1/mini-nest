@@ -1,9 +1,10 @@
 import { Injectable } from "../../injectable";
+import { Log } from "../../log/log";
 
 @Injectable()
 class LoggerService {
     log(msg: string) {
-        console.log('[LoggerService]', msg);
+        Log.info(`[LoggerService] ${msg}`);
     }
 }
 
