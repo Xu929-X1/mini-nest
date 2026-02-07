@@ -1,6 +1,6 @@
-import { Constructor, Container } from "../container";
-import { HttpRequest } from "../request/http/httpRequest";
-import { HttpResponse } from "../request/http/httpResponse";
+import { Constructor, Container } from "../../container";
+import { HttpRequest } from "../http/httpRequest";
+import { HttpResponse } from "../http/httpResponse";
 
 export interface RouteMetadata {
     controllerClass: Constructor;

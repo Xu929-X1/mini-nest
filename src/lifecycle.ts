@@ -1,4 +1,4 @@
-import { ExecutionContext } from "./core/ExecutionContext";
+import { ExecutionContext } from "./request/core/ExecutionContext";
 
 //module related stuff
 export interface OnInit {
@@ -25,7 +25,7 @@ export interface OnBeforeHandle {
 }
 
 export interface OnAfterHandle {
-    onAfterHandle(ctx: ExecutionContext): void | Promise<void>;
+    onAfterHandle(ctx: ExecutionContext, result: unknown): void | Promise<void>;
 }
 
 export interface OnHandleError {

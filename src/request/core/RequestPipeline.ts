@@ -1,11 +1,11 @@
-import { Container } from "../container";
-import { exceptionHandler, NotFoundException } from "../exceptions";
-import { HttpRequest, RawRequest } from "../request/http/httpRequest";
-import { HttpResponse } from "../request/http/httpResponse";
-import { applyInterceptors } from "../request/interceptor";
-import { metadata } from "../request/metadata";
-import { resolveHandlerArguments } from "../request/resolveHandlerArgument";
-import { routeRegistryTrie } from "../request/routeRegistry";
+import { Container } from "../../container";
+import { exceptionHandler, InternalServerErrorException, NotFoundException } from "../../exceptions";
+import { HttpRequest, RawRequest } from "../http/httpRequest";
+import { HttpResponse } from "../http/httpResponse";
+import { applyInterceptors } from "../interceptor";
+import { metadata } from "../metadata";
+import { resolveHandlerArguments } from "../resolveHandlerArgument";
+import { routeRegistryTrie } from "../routeRegistry";
 import { ExecutionContext } from "./ExecutionContext";
 
 export class RequestPipeline {
@@ -71,7 +71,6 @@ export class RequestPipeline {
             if (typeof controllerInstance.onHandleError === 'function') {
                 await controllerInstance.onHandleError(executionContext, error instanceof Error ? error : new Error(String(error)));
             }
-
             return exceptionHandler.handleException(error, executionContext);
         }
     }

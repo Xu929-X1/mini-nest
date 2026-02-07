@@ -1,4 +1,4 @@
-import { ExecutionContext } from "./core/ExecutionContext";
+import { ExecutionContext } from "./request/core/ExecutionContext";
 import { OnDestroy, OnInit } from "./lifecycle";
 
 export interface Constructor<T = any> extends Function {

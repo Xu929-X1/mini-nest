@@ -1,7 +1,7 @@
 // src/examples/pipeline.example.ts
 import "reflect-metadata";
 import { Container } from "../container";
-import { RequestPipeline } from "../core/RequestPipeline";
+import { RequestPipeline } from "../request/core/RequestPipeline";
 import "./controllers/UserController";  // 触发装饰器注册路由
 
 const pipeline = new RequestPipeline(Container.instance);
