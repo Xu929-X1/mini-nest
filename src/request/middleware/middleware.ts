@@ -1,3 +1,5 @@
+import { HttpRequest } from "../http/httpRequest";
+import { HttpResponse } from "../http/httpResponse";
 import { Middleware } from "./type";
 
 
@@ -23,7 +25,7 @@ import { Middleware } from "./type";
 
 export const middlewareRegistry = new MiddlewareRegistry();
 
-export async function runMiddleware(middlewares: Middleware[], req: Request, res: Response) {
+export async function runMiddleware(middlewares: Middleware[], req: HttpRequest, res: HttpResponse): Promise<void> {
     let index = -1;
     async function dispatch(i: number): Promise<void> {
         if (i <= index) {

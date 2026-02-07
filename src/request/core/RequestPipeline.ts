@@ -1,5 +1,5 @@
 import { Container } from "../../container";
-import { exceptionHandler, InternalServerErrorException, NotFoundException } from "../../exceptions";
+import { exceptionHandler } from "../../exceptions";
 import { HttpRequest, RawRequest } from "../http/httpRequest";
 import { HttpResponse } from "../http/httpResponse";
 import { applyInterceptors } from "../interceptor";
