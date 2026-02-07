@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { TypeInfo } from "../request/paramRegistry";
 
 class Log {
     static error(msg: string, source?: string) {

@@ -45,9 +45,9 @@ class TrieRoute {
                 currentNode = currentNode.children.get(segment)!;
             }
         }
-        const cInterceptors = classInterceptors.get(route.controllerClass);
+        const cInterceptors = classInterceptors.get(route.controllerClass) ?? [];
         const mInterceptors = methodInterceptors.get(route.controllerClass)?.get(route.handlerName) ?? [];
-        const allInterceptors = [...(cInterceptors ?? []), ...mInterceptors];
+        const allInterceptors = [...cInterceptors, ...mInterceptors];
         if (allInterceptors.length > 0) {
             route.interceptors = allInterceptors;
         }
