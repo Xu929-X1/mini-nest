@@ -24,7 +24,7 @@ export class App {
         switch (this.options.adapter) {
             case "express":
                 Log.info("Starting server with Express adapter...");
-                const { ExpressAdapter } = await import("./adapters/ExpressAdapter");
+                const { ExpressAdapter } = await import("./adapters/expressAdapter");
                 const handler = async (raw: RawRequest) => {
                     return await requestPipeline.handle(raw);
                 }
