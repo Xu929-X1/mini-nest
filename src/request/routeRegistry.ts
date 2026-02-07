@@ -59,7 +59,7 @@ class TrieRoute {
         const segments = cleanPath.split('/').filter(Boolean);
         let currentNode: RouteTrieNode | undefined = this.root.get(method);
         if (!currentNode) {
-            throw new Error(`No routes found for method ${method}`);
+            return undefined;
         };
         const params: Record<string, string> = {};
 

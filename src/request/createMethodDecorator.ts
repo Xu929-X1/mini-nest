@@ -2,8 +2,6 @@ import { Constructor } from "../container";
 import { HttpMethod } from "./http/httpRequest";
 import { metadata } from "./metadata";
 
-const httpMethods: HttpMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'];
-
 function createMethodDecorator(method: HttpMethod) {
     return function (url: string) {
         return function (target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
