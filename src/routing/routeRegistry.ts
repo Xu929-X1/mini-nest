@@ -119,10 +119,6 @@ class TrieRoute {
         }
     }
 
-    log() {
-        Log.info("Current Route Trie:");
-    }
-
 }
 
 export const routeRegistryTrie = new TrieRoute();
