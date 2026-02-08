@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { Log } from "./log/log";
 // Preflight check for emitDecoratorMetadata
 export function checkDecoratorMetadata() {
     @((target: any) => { })
@@ -16,5 +17,7 @@ export function checkDecoratorMetadata() {
             `  2. Use tsc: npx tsc && node dist/your-app.js\n` +
             `  3. Configure SWC with decoratorMetadata: true\n`
         );
+    }else{
+        Log.info('[Metadata check]: Metadata check complete, starting server...')
     }
 }

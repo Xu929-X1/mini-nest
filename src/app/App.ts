@@ -1,4 +1,5 @@
 import { Constructor, Container } from "../container";
+import { checkDecoratorMetadata } from "../decoratorCheck";
 import { InternalServerErrorException } from "../exceptions";
 import { OnAppBootstrap, OnAppShutdown } from "../lifecycle";
 import { Log } from "../log/log";
@@ -31,6 +32,7 @@ export class App {
     };
 
     async listen(cb: () => void = () => { }): Promise<void> {
+        checkDecoratorMetadata();
         await this.bootstrapControllers();
         await this.triggerBootstrapHooks();
         const requestPipeline = new RequestPipeline(Container.instance);
@@ -53,6 +55,8 @@ export class App {
             default:
                 throw new Error(`Unsupported HTTP adapter: ${this.options.adapter}`);
         }
+
+        this.setupGracefulShutdown();
     }
 
     async shutdown(): Promise<void> {
@@ -76,6 +80,16 @@ export class App {
             this.container.resolve(controller);
         }
         Log.info(`[Controller Register]: Registered ${controllers.length} controllers`)
+    }
+
+    private setupGracefulShutdown(): void {
+        const shutdown = async () => {
+            Log.info('Shutting down server...');
+            await this.shutdown();
+            process.exit(0);
+        };
+        process.on('SIGINT', shutdown);
+        process.on('SIGTERM', shutdown);
     }
 
     private async triggerBootstrapHooks(): Promise<void> {
