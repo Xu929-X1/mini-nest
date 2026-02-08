@@ -1,4 +1,4 @@
-import { InternalServerErrorException } from "../../exceptions";
+import { InternalServerErrorException } from "../exceptions/HTTPExceptions";
 
 export class HttpResponse {
     private _statusCode: number = 200;

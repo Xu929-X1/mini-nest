@@ -1,9 +1,9 @@
 import { HttpAdapter, RequestHandler } from "./httpAdapter";
 import express, { Express } from "express";
 import * as http from "http";
-import { HttpMethod } from "../../request/http/httpRequest";
 import * as fs from "fs";
 import * as https from "https";
+import { HttpMethod } from "../httpRequest";
 
 export interface ExpressAdapterOptions {
     https?: {
@@ -30,7 +30,7 @@ export class ExpressAdapter implements HttpAdapter {
 
             res.status(result.statusCode);
             for (const [key, value] of Object.entries(result.headers)) {
-                res.setHeader(key, value);
+                res.setHeader(key, value as string); 
             }
             res.send(result.body);
         });

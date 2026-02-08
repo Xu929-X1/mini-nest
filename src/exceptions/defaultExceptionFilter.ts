@@ -1,6 +1,6 @@
 import { ExecutionContext } from "../core/pipeline/ExecutionContext";
+import { HttpResponse } from "../http/httpResponse";
 import { Log } from "../utils/log";
-import { HttpResponse } from "../request/http/httpResponse";
 import { BaseHTTPException } from "./baseHTTPException";
 import { ExceptionFilter } from "./exceptionFilter";
 

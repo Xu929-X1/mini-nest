@@ -1,5 +1,5 @@
-import { RawRequest } from "../../request/http/httpRequest";
-import { HttpResponse } from "../../request/http/httpResponse";
+import { HttpResponse } from "../httpResponse";
+import { RawRequest } from "../httpRequest";
 
 export interface HTTPAdapterOptions {
     https?: {
