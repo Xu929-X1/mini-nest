@@ -1,7 +1,7 @@
 {
   "name": "mini-nest",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "index.ts",
   "scripts": {
     "app": "ts-node-dev --respawn src/examples/app.example.ts",
     "lint": "eslint . --ext .ts"
