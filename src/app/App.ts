@@ -1,5 +1,6 @@
-import { Container } from "../container";
+import { Constructor, Container } from "../container";
 import { InternalServerErrorException } from "../exceptions";
+import { OnAppBootstrap, OnAppShutdown } from "../lifecycle";
 import { Log } from "../log/log";
 import { RequestPipeline } from "../request/core/RequestPipeline";
 import { RawRequest } from "../request/http/httpRequest";
@@ -8,6 +9,7 @@ export type HTTPAdapter = "express" | "not-supported"; //we'll support more late
 export type AppOptions = {
     port?: number,
     adapter?: HTTPAdapter,
+    controllers: Constructor[]
     /**
      * I am still thinking about how to design this, currently 2 ways:
      * 1. Support only http and let nginx handle https, which is more common in production and simpler to implement.
@@ -29,13 +31,14 @@ export class App {
     };
 
     async listen(cb: () => void = () => { }): Promise<void> {
+        await this.bootstrapControllers();
+        await this.triggerBootstrapHooks();
         const requestPipeline = new RequestPipeline(Container.instance);
         const port = this.options.port || 8080;
         const protocol = this.options.https ? 'HTTPS' : 'HTTP';
         switch (this.options.adapter) {
             case "express":
                 Log.info(`Starting ${protocol} server with Express adapter...`);
-
                 const { ExpressAdapter } = await import("./adapters/expressAdapter");
                 const handler = async (raw: RawRequest) => {
                     return await requestPipeline.handle(raw);
@@ -52,8 +55,8 @@ export class App {
         }
     }
 
-
     async shutdown(): Promise<void> {
+        await this.triggerShutdownHooks();
         if (this.server) {
             await this.server.shutdown();
             await this.container.shutdown();
@@ -62,6 +65,38 @@ export class App {
         }
     }
 
+    private async bootstrapControllers(): Promise<void> {
+        const controllers = this.options.controllers || [];
+        if (controllers.length === 0) {
+            Log.warn("No controllers registered, did you forget to add controllers to createMiniNestApp()?");
+            return;
+        }
+
+        for (const controller of controllers) {
+            this.container.resolve(controller);
+        }
+        Log.info(`[Controller Register]: Registered ${controllers.length} controllers`)
+    }
+
+    private async triggerBootstrapHooks(): Promise<void> {
+        const registeredInstances = this.container.getInstances();
+        for (const instance of registeredInstances) {
+            const maybeBootstrap = instance as unknown as OnAppBootstrap;
+            if (maybeBootstrap && typeof maybeBootstrap.onAppBootstrap === 'function') {
+                await maybeBootstrap.onAppBootstrap();
+            }
+        }
+    }
+
+    private async triggerShutdownHooks(): Promise<void> {
+        const registeredInstances = this.container.getInstances();
+        for (const instance of registeredInstances) {
+            const maybeShutdown = instance as unknown as OnAppShutdown;
+            if (maybeShutdown && typeof maybeShutdown.onAppShutdown === 'function') {
+                await maybeShutdown.onAppShutdown();
+            }
+        }
+    }
 }
 
 export function createMiniNestApp(options: AppOptions): App {
@@ -69,5 +104,6 @@ export function createMiniNestApp(options: AppOptions): App {
         port: options.port || 8080,
         adapter: options.adapter || "express",
         https: options.https,
+        controllers: options.controllers
     });
 }

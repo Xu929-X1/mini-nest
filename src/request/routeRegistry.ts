@@ -11,7 +11,7 @@ export type RouteMetadataType = {
     handlerName: string;
     controllerClass: Constructor;
     interceptors?: Constructor<Interceptor>[];
-    middlwares?: Middleware[];
+    middlewares?: Middleware[];
 };
 export type RouteTrieNode = {
     segment: string;

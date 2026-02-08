@@ -11,12 +11,16 @@ export class Container {
     private depMapOverride = new Map<Constructor, Constructor[]>();
     private readonly instances = new Set<any>();
     private static _containerInstance: Container;
-
+    //currently we support singleton scope, later when module is implemented, we can support transient scope and request scope as well
     static get instance(): Container {
         if (!this._containerInstance) {
             this._containerInstance = new Container();
         }
         return this._containerInstance;
+    }
+
+    getInstances() {
+        return this.instances;
     }
 
     // allow manual registration of dependencies, useful for testing and overriding dependencies
@@ -33,8 +37,6 @@ export class Container {
         }
         try {
             const deps = this.depMapOverride.get(token) || Reflect.getMetadata("design:paramtypes", token) || [];
-            console.log(`[Container] Resolving ${token.name}, deps:`, deps); // ← 加这个
-
             const injections = deps.map((param: Constructor) => this.resolve(param));
             const newInstance = new token(...injections);
             this.container.set(token, newInstance);

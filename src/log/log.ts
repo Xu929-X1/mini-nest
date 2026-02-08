@@ -2,7 +2,7 @@ import chalk from "chalk";
 
 class Log {
     static error(msg: string, source?: string) {
-        console.error(chalk.red(`[ERROR]${source ? ' [' + source + ']' : ''}\n`) + chalk.red(msg));
+        console.error(chalk.red(`[ERROR]${source ? ' [' + source + ']' : ''}`) + chalk.red(msg));
     }
 
     static info(msg: string, source?: string) {
@@ -10,7 +10,7 @@ class Log {
     }
 
     static warn(msg: string, source?: string) {
-        console.warn(chalk.yellow(`[WARN]${source ? ' [' + source + ']' : ''}\n`) + chalk.yellow(msg));
+        console.warn(chalk.yellow(`[WARN]${source ? ' [' + source + ']' : ''}`) + chalk.yellow(msg));
     }
 }
 

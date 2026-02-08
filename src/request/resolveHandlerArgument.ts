@@ -48,7 +48,6 @@ function runValidation(value: any, rule: Validator | ValidatorRule[]): boolean {
 }
 
 function applyDefaultAndCast(value: any, type: TypeInfo) {
-    Log.info(`[applyDefaultAndCast] value: ${value}, type: ${JSON.stringify(type)}`);
     if (value == null || value == undefined) {
         if (type.default != null) {
             return type.default;
@@ -88,7 +87,6 @@ export function resolveHandlerArguments(
     for (const meta of methodParams) {
         const type = meta.type;
         let value: any = undefined;
-        Log.info(`[resolveHandlerArguments] Resolving param: ${meta.key || meta.index}`);
         switch (meta.source) {
             case 'param':
                 value = meta.key ? req.params?.[meta.key] : req.params;

@@ -4,7 +4,6 @@
   "main": "main.js",
   "scripts": {
     "app": "ts-node-dev --respawn src/examples/app.example.ts",
-    "https-app": "ts-node-dev --respawn src/examples/https.example.ts",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [],
