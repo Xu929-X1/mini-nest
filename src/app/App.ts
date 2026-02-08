@@ -68,5 +68,6 @@ export function createMiniNestApp(options: AppOptions): App {
     return new App({
         port: options.port || 8080,
         adapter: options.adapter || "express",
+        https: options.https,
     });
 }
