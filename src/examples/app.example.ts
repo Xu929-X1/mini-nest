@@ -1,4 +1,3 @@
-// src/server.ts
 import 'reflect-metadata';
 import './controllers/UserController';
 import { createMiniNestApp } from '../app/App';

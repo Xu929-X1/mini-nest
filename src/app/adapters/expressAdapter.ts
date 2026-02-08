@@ -2,12 +2,21 @@ import { HttpAdapter, RequestHandler } from "./httpAdapter";
 import express, { Express } from "express";
 import * as http from "http";
 import { HttpMethod } from "../../request/http/httpRequest";
-import { Log } from "../../log/log";
+import * as fs from "fs";
+import * as https from "https";
+
+export interface ExpressAdapterOptions {
+    https?: {
+        key: string;
+        cert: string;
+    }
+}
+
 export class ExpressAdapter implements HttpAdapter {
     private app: Express;
     private server: http.Server | null = null;
 
-    constructor(private handler: RequestHandler) {
+    constructor(private handler: RequestHandler, private options?: ExpressAdapterOptions) {
         this.app = express();
         this.app.use(express.json());
 
@@ -28,7 +37,16 @@ export class ExpressAdapter implements HttpAdapter {
     }
 
     listen(port: number, cb?: () => void): void {
-        this.server = this.app.listen(port, cb);
+        if (this.options?.https) {
+            const { key, cert } = this.options.https;
+            const credentials = {
+                key: fs.readFileSync(key, 'utf8'),
+                cert: fs.readFileSync(cert, 'utf8'),
+            };
+            this.server = https.createServer(credentials, this.app).listen(port, cb);
+        } else {
+            this.server = this.app.listen(port, cb);
+        }
     }
 
     async shutdown(): Promise<void> {
