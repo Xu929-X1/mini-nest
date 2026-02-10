@@ -1,8 +1,8 @@
 import { Constructor } from "../core/container/container";
-import { Log } from "../utils/log";
-import { classInterceptors, Interceptor, methodInterceptors } from "../decorators/interceptor";
+import { Interceptor } from "../interceptor/applyInterceptor";
 import { Middleware } from "../middleware/type";
 import { HttpMethod, HttpRequest } from "../http/httpRequest";
+import { metadata } from "./metadata";
 
 export type RouteMetadataType = {
     method: string;
@@ -45,8 +45,8 @@ class TrieRoute {
                 currentNode = currentNode.children.get(segment)!;
             }
         }
-        const cInterceptors = classInterceptors.get(route.controllerClass) ?? [];
-        const mInterceptors = methodInterceptors.get(route.controllerClass)?.get(route.handlerName) ?? [];
+        const cInterceptors = metadata.getClassInterceptors(route.controllerClass) ?? [];
+        const mInterceptors = metadata.getMethodInterceptors(route.controllerClass, method) ?? [];
         const allInterceptors = [...cInterceptors, ...mInterceptors];
         if (allInterceptors.length > 0) {
             route.interceptors = allInterceptors;

@@ -6,7 +6,6 @@ function createMethodDecorator(method: HttpMethod) {
     return function (url: string) {
         return function (target: Object, propertyKey: string, descriptor?: PropertyDescriptor) {
             const controller = target.constructor;
-
             metadata.registerRouteOnMethodDecoratorLoad(controller as Constructor, url, method, propertyKey);
         };
     };

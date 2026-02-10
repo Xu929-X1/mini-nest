@@ -2,7 +2,7 @@ import { Container } from "../container/container";
 import { exceptionHandler } from "../../exceptions";
 import { HttpRequest, RawRequest } from "../../http/httpRequest";
 import { HttpResponse } from "../../http/httpResponse";
-import { applyInterceptors } from "../../decorators/interceptor";
+import { applyInterceptors } from "../../interceptor/applyInterceptor";
 import { metadata } from "../../routing/metadata";
 import { resolveHandlerArguments } from "../../validation/resolveHandlerArgument";
 import { routeRegistryTrie } from "../../routing/routeRegistry";
