@@ -1,6 +1,6 @@
 import { Constructor } from "../core/container/container";
 import { RuleBuilder, Validator } from "../validation/rule";
-
+//TODO: Change this to reflect metadata
 type ParamSource = 'body' | 'query' | 'param' | 'header';
 
 export type TypeInfo = {

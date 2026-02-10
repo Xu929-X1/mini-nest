@@ -3,7 +3,7 @@ import { ParamMetadata, paramRegistry } from "../routing/paramRegistry";
 import "reflect-metadata";
 import { RuleBuilder, Validator } from "../validation/rule";
 import { Log } from "../utils/log";
-
+export const PARAM_KEY = "mini-nest:param"
 type ParamOptions = {
     key?: string,
     validator?: RuleBuilder | Validator
@@ -23,7 +23,7 @@ function createMethodDecorator(source: ParamMetadata['source']): (paramKeyOrOpti
             }
 
             if (['param', 'query', 'header'].includes(source) && !key) {
-                throw new Error(`@${key}() requires a key (e.g. @${key}('id'))`);
+                throw new Error(`@${source}() requires a key (e.g. @${source}('id'))`);
             }
 
             const paramMetadata: ParamMetadata = {

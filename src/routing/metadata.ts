@@ -3,10 +3,12 @@ import { RouteMetadataType, routeRegistryTrie } from './routeRegistry';
 import { ParamMetadata, paramRegistry } from './paramRegistry';
 import {
   Interceptor,
-  classInterceptors,
-  methodInterceptors,
-} from '../decorators/interceptor';
+  INTERCEPTOR_KEY,
+} from '../interceptor/applyInterceptor';
 import { HttpMethod } from '../http/httpRequest';
+import { GUARD_KEY } from '../guards/guard';
+import { ClassOrPrototype } from '../interceptor/UseInterceptor';
+//temp hash map
 const routeMetaData = new Map<Constructor, RouteMetadataType[]>();
 export const metadata = {
   // 🟦 Route Metadata
@@ -46,6 +48,7 @@ export const metadata = {
       }
       this.registerRoute(route);
     }
+    routeMetaData.delete(controller); //clear the temp hash map after load
   },
 
   // 🟨 Parameter Metadata
@@ -53,60 +56,51 @@ export const metadata = {
     return paramRegistry.get(controller)?.get(methodName) || [];
   },
 
-  registerParam(
-    controller: Constructor,
-    methodName: string,
-    param: ParamMetadata
-  ) {
-    if (!paramRegistry.has(controller)) {
-      paramRegistry.set(controller, new Map());
-    }
-    const methodParams = paramRegistry.get(controller)!;
-    const list = methodParams.get(methodName) || [];
-    list[param.index] = param; // index-safe
-    methodParams.set(methodName, list);
-  },
-
   // 🟥 Interceptor Metadata
   getClassInterceptors(controller: Constructor): Constructor<Interceptor>[] {
-    return classInterceptors.get(controller) || [];
+    return Reflect.getMetadata(INTERCEPTOR_KEY, controller) || [];
   },
 
   getMethodInterceptors(
     controller: Constructor,
     method: string
   ): Constructor<Interceptor>[] {
-    return methodInterceptors.get(controller)?.get(method) || [];
-  },
+    return Reflect.getMetadata(INTERCEPTOR_KEY, controller.prototype, method) || [];
 
-  registerClassInterceptor(
-    controller: Constructor,
-    interceptor: Constructor<Interceptor>
-  ) {
-    const list = classInterceptors.get(controller) || [];
-    list.push(interceptor);
-    classInterceptors.set(controller, list);
   },
 
   registerMethodInterceptor(
-    controller: Constructor,
-    method: string,
+    target: ClassOrPrototype,
+    propertyKey: string,
     interceptor: Constructor<Interceptor>
   ) {
-    if (!methodInterceptors.has(controller)) {
-      methodInterceptors.set(controller, new Map());
-    }
-    const methodMap = methodInterceptors.get(controller)!;
-    const list = methodMap.get(method) || [];
-    list.push(interceptor);
-    methodMap.set(method, list);
+    const existing = Reflect.getMetadata(INTERCEPTOR_KEY, target, propertyKey) || [];
+    Reflect.defineMetadata(INTERCEPTOR_KEY, [...existing, interceptor], target, propertyKey);
   },
+
+  registerClassInterceptor(target: ClassOrPrototype, interceptor: Constructor<Interceptor>) {
+    const existing = Reflect.getMetadata(INTERCEPTOR_KEY, target) || [];
+    Reflect.defineMetadata(INTERCEPTOR_KEY, [...existing, interceptor], target);
+  },
+
+  registerMethodParam(target: ClassOrPrototype, propertyKey: string, params: ParamMetadata) {
+
+  },
+
+  registerClassParam(target: ClassOrPrototype, param: ParamMetadata) {
+
+  },
+
+
 
   // 🧹 Optional Cleanup
   clearAll() {
     routeRegistryTrie.clear();
     paramRegistry.clear();
-    classInterceptors.clear();
-    methodInterceptors.clear();
+    this.deleteMetadataFromNamespace(INTERCEPTOR_KEY);
+    this.deleteMetadataFromNamespace(GUARD_KEY)
   },
+
+  deleteMetadataFromNamespace(name: string) {
+  }
 };
