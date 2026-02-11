@@ -1,4 +1,3 @@
-import { Constructor } from "../core/container/container";
 import { RuleBuilder, Validator } from "../validation/rule";
 //TODO: Change this to reflect metadata
 type ParamSource = 'body' | 'query' | 'param' | 'header';
@@ -19,6 +18,3 @@ export type ParamMetadata = {
     validator?: RuleBuilder | Validator;
 
 };
-type ParamRegistry = Map<Constructor, Map<string, ParamMetadata[]>>;
-
-export const paramRegistry: ParamRegistry = new Map();

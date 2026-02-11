@@ -1,13 +1,12 @@
 import { Constructor } from '../core/container/container';
 import { RouteMetadataType, routeRegistryTrie } from './routeRegistry';
-import { ParamMetadata, paramRegistry } from './paramRegistry';
+import { ParamMetadata } from './paramTypes';
 import {
   Interceptor,
-  INTERCEPTOR_KEY,
 } from '../interceptor/applyInterceptor';
 import { HttpMethod } from '../http/httpRequest';
-import { GUARD_KEY } from '../guards/guard';
 import { ClassOrPrototype } from '../interceptor/UseInterceptor';
+import { GUARDS, INTERCEPTORS } from './metadataKeys';
 //temp hash map
 const routeMetaData = new Map<Constructor, RouteMetadataType[]>();
 export const metadata = {
@@ -53,20 +52,19 @@ export const metadata = {
 
   // 🟨 Parameter Metadata
   getParams(controller: Constructor, methodName: string): ParamMetadata[] {
-    return paramRegistry.get(controller)?.get(methodName) || [];
+    return []
   },
 
   // 🟥 Interceptor Metadata
   getClassInterceptors(controller: Constructor): Constructor<Interceptor>[] {
-    return Reflect.getMetadata(INTERCEPTOR_KEY, controller) || [];
+    return INTERCEPTORS.get(controller) ?? [];
   },
 
   getMethodInterceptors(
     controller: Constructor,
     method: string
   ): Constructor<Interceptor>[] {
-    return Reflect.getMetadata(INTERCEPTOR_KEY, controller.prototype, method) || [];
-
+    return INTERCEPTORS.get(controller, method) ?? [];
   },
 
   registerMethodInterceptor(
@@ -96,9 +94,6 @@ export const metadata = {
   // 🧹 Optional Cleanup
   clearAll() {
     routeRegistryTrie.clear();
-    paramRegistry.clear();
-    this.deleteMetadataFromNamespace(INTERCEPTOR_KEY);
-    this.deleteMetadataFromNamespace(GUARD_KEY)
   },
 
   deleteMetadataFromNamespace(name: string) {

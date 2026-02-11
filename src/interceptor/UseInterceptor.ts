@@ -1,5 +1,6 @@
 import { Constructor } from "../core/container/container";
 import { metadata } from "../routing/metadata";
+import { INTERCEPTORS } from "../routing/metadataKeys";
 import { Interceptor } from "./applyInterceptor";
 export type ClassOrPrototype = Constructor | Record<string, any>;
 export function UseInterceptor(interceptor: Constructor<Interceptor>) {
@@ -8,9 +9,9 @@ export function UseInterceptor(interceptor: Constructor<Interceptor>) {
         propertyKey?: string,
     ) {
         if (propertyKey) {
-            metadata.registerMethodInterceptor(target, propertyKey, interceptor);
+            INTERCEPTORS.append(target, interceptor, propertyKey);
         } else {
-            metadata.registerClassInterceptor(target, interceptor);
+            INTERCEPTORS.append(target, interceptor);
         }
     };
 }

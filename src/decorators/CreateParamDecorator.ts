@@ -1,5 +1,5 @@
 import { Constructor } from "../core/container/container";
-import { ParamMetadata, paramRegistry } from "../routing/paramRegistry";
+import { ParamMetadata } from "../routing/paramTypes";
 import "reflect-metadata";
 import { RuleBuilder, Validator } from "../validation/rule";
 import { Log } from "../utils/log";
