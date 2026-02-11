@@ -7,6 +7,7 @@ import { metadata } from "../../routing/metadata";
 import { resolveHandlerArguments } from "../../validation/resolveHandlerArgument";
 import { routeRegistryTrie } from "../../routing/routeRegistry";
 import { ExecutionContext } from "./ExecutionContext";
+import { applyGuards } from "../../guards/applyGuard";
 
 export class RequestPipeline {
     constructor(private readonly container: Container) { }
@@ -36,8 +37,12 @@ export class RequestPipeline {
             if (typeof controllerInstance.onBeforeHandle === 'function') {
                 await controllerInstance.onBeforeHandle(executionContext);
             }
-            //guard
-
+            //guards
+            const guards = [
+                ...metadata.getClassGuards(route.controllerClass),
+                ...metadata.getMethodGuards(route.controllerClass, route.handlerName)
+            ];
+            await applyGuards(guards, executionContext);
             //interceptors
             const interceptors = [
                 ...metadata.getClassInterceptors(route.controllerClass) || [],
