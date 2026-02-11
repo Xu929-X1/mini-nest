@@ -78,7 +78,7 @@ export function resolveHandlerArguments(
     methodName: string,
     req: RequestContext
 ): any[] {
-    const methodParams = PARAMS.getOrDefault(controllerClass, [], methodName);
+    const methodParams = PARAMS.getOrDefault(controllerClass.prototype, [], methodName);
     if (!methodParams || methodParams.length === 0) {
         return [];
     }

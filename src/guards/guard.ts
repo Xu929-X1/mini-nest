@@ -7,7 +7,7 @@ export interface Guard {
     canActivate(ctx: ExecutionContext): boolean | Promise<boolean>
 }
 
-export function Guard(guards: Array<Constructor<Guard>>) {
+export function UseGuard(guards: Array<Constructor<Guard>>) {
     return function (
         target: ClassOrPrototype,
         propertyKey: string,
