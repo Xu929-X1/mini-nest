@@ -1,8 +1,6 @@
 import { Constructor } from "../core/container/container";
-import { Interceptor } from "../interceptor/applyInterceptor";
 import { Middleware } from "../middleware/type";
 import { HttpMethod, HttpRequest } from "../http/httpRequest";
-import { metadata } from "./metadata";
 
 export type RouteMetadataType = {
     method: string;
@@ -10,7 +8,6 @@ export type RouteMetadataType = {
     fullUrl?: string;
     handlerName: string;
     controllerClass: Constructor;
-    interceptors?: Constructor<Interceptor>[];
     middlewares?: Middleware[];
 };
 export type RouteTrieNode = {
@@ -45,12 +42,7 @@ class TrieRoute {
                 currentNode = currentNode.children.get(segment)!;
             }
         }
-        const cInterceptors = metadata.getClassInterceptors(route.controllerClass) ?? [];
-        const mInterceptors = metadata.getMethodInterceptors(route.controllerClass, method) ?? [];
-        const allInterceptors = [...cInterceptors, ...mInterceptors];
-        if (allInterceptors.length > 0) {
-            route.interceptors = allInterceptors;
-        }
+     
         currentNode.routeMetadata = route;
     }
 
