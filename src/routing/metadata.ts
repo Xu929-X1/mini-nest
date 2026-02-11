@@ -7,6 +7,7 @@ import {
 import { HttpMethod } from '../http/httpRequest';
 import { ClassOrPrototype } from '../interceptor/UseInterceptor';
 import { GUARDS, INTERCEPTORS, PARAMS } from './metadataKeys';
+import { Guard } from '../guards/guard';
 //temp hash map
 const routeMetaData = new Map<Constructor, RouteMetadataType[]>();
 export const metadata = {
@@ -67,21 +68,17 @@ export const metadata = {
     return INTERCEPTORS.get(controller, method) ?? [];
   },
 
-  registerMethodParam(target: ClassOrPrototype, propertyKey: string, params: ParamMetadata) {
-
+  getClassGuards(controller: Constructor): Constructor<Guard>[] {
+    return GUARDS.getOrDefault(controller, []);
   },
 
-  registerClassParam(target: ClassOrPrototype, param: ParamMetadata) {
-
+  getMethodGuards(controller: Constructor, method: string): Constructor<Guard>[] {
+    return GUARDS.getOrDefault(controller.prototype, [], method);
   },
-
-
 
   // 🧹 Optional Cleanup
   clearAll() {
     routeRegistryTrie.clear();
   },
 
-  deleteMetadataFromNamespace(name: string) {
-  }
 };
