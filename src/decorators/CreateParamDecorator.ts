@@ -3,6 +3,7 @@ import { ParamMetadata } from "../routing/paramTypes";
 import "reflect-metadata";
 import { RuleBuilder, Validator } from "../validation/rule";
 import { Log } from "../utils/log";
+import { PARAMS } from "../routing/metadataKeys";
 export const PARAM_KEY = "mini-nest:param"
 type ParamOptions = {
     key?: string,
@@ -25,46 +26,35 @@ function createMethodDecorator(source: ParamMetadata['source']): (paramKeyOrOpti
             if (['param', 'query', 'header'].includes(source) && !key) {
                 throw new Error(`@${source}() requires a key (e.g. @${source}('id'))`);
             }
+            const methodName = propertyKey?.toString() || "";
 
+            const types = Reflect.getMetadata("design:paramtypes", target, propertyKey!) as any[];
             const paramMetadata: ParamMetadata = {
                 index: parameterIndex,
-                source: source as ParamMetadata["source"],
-                key: key,
-                validator: validator,
+                source,
+                key,
+                validator,
             };
-            registerParam(target, propertyKey, paramMetadata);
+
+            if (types && types[parameterIndex]) {
+                paramMetadata.type = {
+                    name: types[parameterIndex]?.name,
+                    raw: types[parameterIndex],
+                    isPrimitive: [String, Number, Boolean].includes(types[parameterIndex]),
+                    isArray: types[parameterIndex] === Array,
+                };
+            }
+
+            const existing = PARAMS.getOrDefault(target, [], methodName);
+            existing[parameterIndex] = paramMetadata;
+            PARAMS.set(target, existing, methodName);
+
+            if (process.env.NODE_ENV === "development") {
+                Log.info(`[ParamRegistry] ${target.constructor.name}.${methodName}(${parameterIndex}) ← ${source}${key ? `('${key}')` : ''}`);
+            }
         };
     };
 
-}
-
-function registerParam(target: Object, propertyKey: string | symbol | undefined, meta: ParamMetadata) {
-    const controller = target.constructor;
-    const methodName = propertyKey?.toString() || "";
-    //collect type info, use this later in apply default casting
-    const type = Reflect.getMetadata("design:paramtypes", target, propertyKey!) as any[];
-    if (type && type[meta.index]) {
-        meta.type = {
-            name: type[meta.index]?.name,
-            raw: type[meta.index],
-            isPrimitive: [String, Number, Boolean].includes(type[meta.index]),
-            isArray: type[meta.index] === Array,
-        };
-    }
-    if (!paramRegistry.has(controller as Constructor<any>)) {
-        paramRegistry.set(controller as Constructor<any>, new Map<string, ParamMetadata[]>());
-    }
-    const methodParams = paramRegistry.get(controller as Constructor<any>)!;
-    if (!methodParams.has(methodName)) {
-        methodParams.set(methodName, []);
-    }
-    const existingParams = methodParams.get(methodName)!;
-    //make sure it is index safe
-    existingParams[meta.index] = meta;
-    // log out the param metadata for debugging
-    if (process.env.NODE_ENV === "development") {
-        Log.info(`[ParamRegistry] ${controller.name}.${methodName}(${meta.index}) ← ${meta.source}${meta.key ? `('${meta.key}')` : ''}`);
-    }
 }
 
 const Body = createMethodDecorator("body");

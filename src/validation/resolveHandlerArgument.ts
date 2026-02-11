@@ -1,5 +1,6 @@
 import { Constructor } from '../core/container/container';
-import { paramRegistry, TypeInfo } from '../routing/paramTypes';
+import { PARAMS } from '../routing/metadataKeys';
+import { TypeInfo } from '../routing/paramTypes';
 import { RuleBuilder, Validator, ValidatorRule } from './rule';
 
 interface RequestContext {
@@ -77,7 +78,7 @@ export function resolveHandlerArguments(
     methodName: string,
     req: RequestContext
 ): any[] {
-    const methodParams = paramRegistry.get(controllerClass)?.get(methodName.toString());
+    const methodParams = PARAMS.getOrDefault(controllerClass, [], methodName);
     if (!methodParams || methodParams.length === 0) {
         return [];
     }

@@ -6,7 +6,7 @@ import {
 } from '../interceptor/applyInterceptor';
 import { HttpMethod } from '../http/httpRequest';
 import { ClassOrPrototype } from '../interceptor/UseInterceptor';
-import { GUARDS, INTERCEPTORS } from './metadataKeys';
+import { GUARDS, INTERCEPTORS, PARAMS } from './metadataKeys';
 //temp hash map
 const routeMetaData = new Map<Constructor, RouteMetadataType[]>();
 export const metadata = {
@@ -52,7 +52,7 @@ export const metadata = {
 
   // 🟨 Parameter Metadata
   getParams(controller: Constructor, methodName: string): ParamMetadata[] {
-    return []
+    return PARAMS.getOrDefault(controller, [], methodName);
   },
 
   // 🟥 Interceptor Metadata
@@ -65,20 +65,6 @@ export const metadata = {
     method: string
   ): Constructor<Interceptor>[] {
     return INTERCEPTORS.get(controller, method) ?? [];
-  },
-
-  registerMethodInterceptor(
-    target: ClassOrPrototype,
-    propertyKey: string,
-    interceptor: Constructor<Interceptor>
-  ) {
-    const existing = Reflect.getMetadata(INTERCEPTOR_KEY, target, propertyKey) || [];
-    Reflect.defineMetadata(INTERCEPTOR_KEY, [...existing, interceptor], target, propertyKey);
-  },
-
-  registerClassInterceptor(target: ClassOrPrototype, interceptor: Constructor<Interceptor>) {
-    const existing = Reflect.getMetadata(INTERCEPTOR_KEY, target) || [];
-    Reflect.defineMetadata(INTERCEPTOR_KEY, [...existing, interceptor], target);
   },
 
   registerMethodParam(target: ClassOrPrototype, propertyKey: string, params: ParamMetadata) {
