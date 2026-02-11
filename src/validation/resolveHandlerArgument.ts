@@ -1,5 +1,5 @@
 import { Constructor } from '../core/container/container';
-import { paramRegistry, TypeInfo } from '../routing/paramRegistry';
+import { paramRegistry, TypeInfo } from '../routing/paramTypes';
 import { RuleBuilder, Validator, ValidatorRule } from './rule';
 
 interface RequestContext {
