@@ -1,4 +1,3 @@
-import { Constructor } from "../core/container/container";
 import { ParamMetadata } from "../routing/paramTypes";
 import "reflect-metadata";
 import { RuleBuilder, Validator } from "../validation/rule";
@@ -10,7 +9,7 @@ type ParamOptions = {
     validator?: RuleBuilder | Validator
 }
 
-function createMethodDecorator(source: ParamMetadata['source']): (paramKeyOrOption: string | ParamOptions) => ParameterDecorator {
+function createMethodDecorator(source: ParamMetadata['source']): (paramKeyOrOption?: string | ParamOptions) => ParameterDecorator {
     return function (paramKeyOrOption?: string | ParamOptions) {
         return function (target: Object, propertyKey: string | symbol | undefined, parameterIndex: number) {
             //body does not require a key, but others do
@@ -54,7 +53,6 @@ function createMethodDecorator(source: ParamMetadata['source']): (paramKeyOrOpti
             }
         };
     };
-
 }
 
 const Body = createMethodDecorator("body");

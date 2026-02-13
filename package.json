@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "bff-example": "npx ts-node src/examples/bff-examples/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +14,8 @@
     "chalk": "^5.6.2",
     "express": "^5.2.1",
     "reflect-metadata": "^0.2.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "undici": "^7.21.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
