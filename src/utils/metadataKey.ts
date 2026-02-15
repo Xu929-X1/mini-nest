@@ -1,5 +1,5 @@
 export class MetadataKey<T> {
-    constructor(public readonly key: string) { }
+    constructor(public readonly key: string | symbol) { }
 
     get(target: object, propertyKey?: string): T | undefined {
         return propertyKey ? Reflect.getMetadata(this.key, target, propertyKey) : Reflect.getMetadata(this.key, target);

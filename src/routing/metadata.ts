@@ -5,7 +5,6 @@ import {
   Interceptor,
 } from '../interceptor/applyInterceptor';
 import { HttpMethod } from '../http/httpRequest';
-import { ClassOrPrototype } from '../interceptor/UseInterceptor';
 import { GUARDS, INTERCEPTORS, PARAMS } from './metadataKeys';
 import { Guard } from '../guards/guard';
 //temp hash map
