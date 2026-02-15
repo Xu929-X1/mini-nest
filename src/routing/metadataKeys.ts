@@ -3,9 +3,17 @@ import { Constructor } from '../core/container/container';
 import { Guard } from '../guards/guard';
 import { Interceptor } from '../interceptor/applyInterceptor';
 import { ParamMetadata } from './paramTypes';
-export const INTERCEPTOR_KEY = "mini-nest:interceptor";
-export const GUARD_KEY = "mini-nest:guards"
-export const PARAM_KEY = "mini-nest:params"
+import { CacheOptions } from '../decorators/cache';
+export const INTERCEPTOR_KEY = Symbol("mini-nest:interceptor");
+export const GUARD_KEY = Symbol("mini-nest:guards");
+export const PARAM_KEY = Symbol("mini-nest:params");
+export const CACHE_KEY = Symbol("mini-nest:cache");
+export const RETRY_KEY = Symbol("mini-nest:retry");
+export const TIMEOUT_KEY = Symbol("mini-nest:timeout");
+
 export const PARAMS = new MetadataKey<ParamMetadata[]>(PARAM_KEY);
 export const GUARDS = new MetadataKey<Constructor<Guard>[]>(GUARD_KEY);
 export const INTERCEPTORS = new MetadataKey<Constructor<Interceptor>[]>(INTERCEPTOR_KEY);
+export const TIMEOUT = new MetadataKey<number>(TIMEOUT_KEY);
+export const RETRY = new MetadataKey<number>(RETRY_KEY);
+export const CACHE = new MetadataKey<CacheOptions>(CACHE_KEY);
