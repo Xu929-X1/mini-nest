@@ -1,5 +1,6 @@
 import { ExecutionContext } from "../pipeline/ExecutionContext";
 import { OnDestroy, OnInit } from "../../lifecycle/lifecycle";
+import { wrapWithAOP } from "../../aop/aopWrapper";
 
 export interface Constructor<T = any> extends Function {
     new(...args: any[]): T;
@@ -31,7 +32,7 @@ export class Container {
     }
 
     // resolve a token, if it is not in the container, create a new instance and store it in the container
-    resolve<T>(token: Constructor<T>, context?: ExecutionContext): T {
+    resolve<T extends object>(token: Constructor<T>, context?: ExecutionContext): T {
         if (this.container.has(token)) {
             return this.container.get(token) as T;
         }
@@ -39,19 +40,21 @@ export class Container {
             const deps = this.depMapOverride.get(token) || Reflect.getMetadata("design:paramtypes", token) || [];
             const injections = deps.map((param: Constructor) => this.resolve(param));
             const newInstance = new token(...injections);
-            this.container.set(token, newInstance);
-            this.instances.add(newInstance);
 
             const maybeInit = newInstance as unknown as OnInit;
             if (maybeInit && typeof maybeInit.onModuleInit === 'function') {
                 maybeInit.onModuleInit();
             }
 
-            return newInstance;
+            const wrapped = wrapWithAOP(newInstance, token);
+
+            this.container.set(token, wrapped);
+            this.instances.add(wrapped);
+
+            return wrapped;
         } catch (error) {
             throw new Error(`Error resolving ${token.name}: ${error}`);
         }
-
     }
 
     async shutdown(): Promise<void> {
