@@ -34,7 +34,14 @@ class CacheManager {
     }
 
     has(key: string | symbol) {
-        return this.cache.has(key);
+        const entry = this.cache.get(key);
+        if (!entry) return false;
+        if (Date.now() > entry?.expiresAt) {
+            this.cache.delete(key);
+            return false
+        }
+
+        return true;
     }
 }
 

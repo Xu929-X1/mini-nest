@@ -61,7 +61,9 @@ export async function executeWithAOP(ctx: AOPContext) {
         cache
     } = ctx;
 
-    const cacheKey = cache ? cache.key : null;
+    const cacheKey = cache
+        ? (cache.key ?? `${ctx.className}:${ctx.methodName}:${JSON.stringify(args)}`)
+        : null;
     if (cacheKey && cacheManager.has(cacheKey)) {
         return cacheManager.get(cacheKey);
     }
