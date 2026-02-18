@@ -1,4 +1,4 @@
-import { errors, request } from "undici";
+import { request } from "undici";
 import { Injectable } from "../../decorators/Injectable";
 import { HttpMethod } from "../httpRequest";
 import { Log } from "../../utils/log";
@@ -14,6 +14,42 @@ export interface HttpClientResponse<T> {
     data: T,
     status: number,
     headers?: Record<string, string | string[] | undefined>
+}
+
+interface SourceConfig {
+    url: string,
+    method?: HttpMethod,
+    body?: any;
+    headers?: Record<string, string>
+}
+
+interface AggregateResultItem {
+    key: string;
+    data: any;
+    error: Error | null;
+}
+
+type SourceDef = string | SourceConfig
+
+export interface AggregateOption<S extends Record<string, SourceDef>, R> {
+    sources: S,
+    output: (
+        sources: {
+            [K in keyof S]: any
+        },
+        errors?: {
+            [K in keyof S]?: Error
+        }
+    ) => R,
+    timeout?: number;
+    partial?: boolean;
+    params?: Record<string, any>;
+    baseUrl?: string
+}
+
+export interface AggregateResult<R> {
+    data: R
+    errors?: Record<string, Error>
 }
 
 @Injectable()
@@ -41,7 +77,81 @@ export class HttpClient {
         return this.dispatchRequest<T>('DELETE', url, undefined, options);
     }
 
+    async aggregate<S extends Record<string, SourceDef>, R>(options: AggregateOption<S, R>): Promise<AggregateResult<R>> {
+        const { params = {}, sources, output, timeout, partial = false, baseUrl = '' } = options;
+        const requestEntries = Object.entries(sources);
+        const promises: Promise<AggregateResultItem>[] = requestEntries.map(async ([key, source]) => {
+            //if source is only string default to get method
+            const config = typeof source === 'string' ? { url: source, method: "GET", headers: undefined, body: undefined } : { method: "GET", ...source };
+            const url = baseUrl + this.resolveUrl(config.url, params);
+            try {
+                let res
+                switch (config.method as HttpMethod) {
+                    case "GET":
+                        res = await this.get(url, { timeout, headers: config.headers });
+                        break;
+                    case "POST":
+                        res = await this.post(url, config.body, { timeout, headers: config.headers });
+                        break;
+                    case "PUT":
+                        res = await this.put(url, config.body, { timeout, headers: config.headers });
+                        break;
+                    case "DELETE":
+                        res = await this.delete(url, { timeout, headers: config.headers });
+                        break;
+                    case "PATCH":
+                        res = await this.patch(url, config.body, { timeout, headers: config.headers });
+                        break;
+                    default:
+                        throw Error("Unsupported method detected");
+                }
+                return {
+                    key,
+                    data: res?.data,
+                    error: null
+                }
+            } catch (error) {
+                if (partial) {
+                    return {
+                        key,
+                        data: null,
+                        error: error as Error
+                    }
+                } else {
+                    throw error;
+                }
+            }
+        });
 
+        const results = await Promise.all(promises);
+        const sourcesData: Record<string, any> = {};
+        const errors: Record<string, Error> = {};
+
+
+        for (const result of results) {
+            if (result.error) {
+                errors[result.key] = result.error;
+            } else {
+                sourcesData[result.key] = result.data;
+            }
+        }
+
+        const data = output(sourcesData as any, errors);
+        return {
+            data,
+            errors
+        }
+    }
+
+    private resolveUrl(template: string, params: Record<string, any>): string {
+        return template.replace(/:(\w+)/g, (_, key) => {
+            const value = params[key];
+            if (value === undefined) {
+                throw new Error(`Missing param: ${key}`);
+            }
+            return encodeURIComponent(String(value));
+        });
+    }
 
     private async dispatchRequest<T>(
         method: HttpMethod,
