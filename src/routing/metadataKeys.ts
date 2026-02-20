@@ -4,12 +4,14 @@ import { Guard } from '../guards/guard';
 import { Interceptor } from '../interceptor/applyInterceptor';
 import { ParamMetadata } from './paramTypes';
 import { CacheOptions } from '../decorators/cache';
+import { CircuitBreakerOptions } from '../decorators/circuitBreaker';
 export const INTERCEPTOR_KEY = Symbol("mini-nest:interceptor");
 export const GUARD_KEY = Symbol("mini-nest:guards");
 export const PARAM_KEY = Symbol("mini-nest:params");
 export const CACHE_KEY = Symbol("mini-nest:cache");
 export const RETRY_KEY = Symbol("mini-nest:retry");
 export const TIMEOUT_KEY = Symbol("mini-nest:timeout");
+export const CIRCUIT_BREAKER_KEY = Symbol("mini-nest:circuit-breaker");
 
 export const PARAMS = new MetadataKey<ParamMetadata[]>(PARAM_KEY);
 export const GUARDS = new MetadataKey<Constructor<Guard>[]>(GUARD_KEY);
@@ -17,3 +19,4 @@ export const INTERCEPTORS = new MetadataKey<Constructor<Interceptor>[]>(INTERCEP
 export const TIMEOUT = new MetadataKey<number>(TIMEOUT_KEY);
 export const RETRY = new MetadataKey<number>(RETRY_KEY);
 export const CACHE = new MetadataKey<CacheOptions>(CACHE_KEY);
+export const CIRCUITBREAKER = new MetadataKey<CircuitBreakerOptions>(CIRCUIT_BREAKER_KEY);
