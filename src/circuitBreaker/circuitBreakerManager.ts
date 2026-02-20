@@ -1,4 +1,4 @@
-type CircuitState = "Open" | "CLOSED" | "HALF_OPEN";
+type CircuitState = "OPEN" | "CLOSED" | "HALF_OPEN";
 
 interface CircuitBreakerState {
     circuitState: CircuitState;
@@ -22,6 +22,7 @@ class CircuitBreakerManager {
                 failures: 0,
                 lastFailureTimeStamp: 0
             }
+            this.state.set(key, state);
         }
         return state;
     }
@@ -38,7 +39,7 @@ class CircuitBreakerManager {
         state.lastFailureTimeStamp = Date.now();
 
         if (state.failures >= threshold) {
-            state.circuitState = "Open";
+            state.circuitState = "OPEN";
         }
 
     }
@@ -52,7 +53,7 @@ class CircuitBreakerManager {
             }
         }
 
-        if (state.circuitState === "Open") {
+        if (state.circuitState === "OPEN") {
             const elapsedTime = Date.now() - state.lastFailureTimeStamp;
             if (elapsedTime >= resetTimeout) {
                 state.circuitState = "HALF_OPEN";

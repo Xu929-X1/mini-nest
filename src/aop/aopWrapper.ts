@@ -33,7 +33,7 @@ export function wrapWithAOP<T extends object>(instance: T, token: Constructor<T>
             const cache = CACHE.get(proto, propKey);
             const retry = RETRY.get(proto, propKey);
             const circuitBreaker = CIRCUITBREAKER.get(proto, propKey);
-            if (timeout === undefined && cache === undefined && retry === undefined) {
+            if (timeout === undefined && cache === undefined && retry === undefined && circuitBreaker === undefined) {
                 return original.bind(target);
             }
 
