@@ -1,7 +1,10 @@
 import { cacheManager } from "../cache/cacheManager";
+import { circuitBreakerManager } from "../circuitBreaker/circuitBreakerManager";
+import { CircuitOpenError } from "../circuitBreaker/circuitOpenError";
 import { Constructor } from "../core/container/container";
 import { CacheOptions } from "../decorators/cache";
-import { CACHE, RETRY, TIMEOUT } from "../routing/metadataKeys";
+import { CircuitBreakerOptions } from "../decorators/circuitBreaker";
+import { CACHE, CIRCUITBREAKER, RETRY, TIMEOUT } from "../routing/metadataKeys";
 
 export interface AOPContext {
     target: Object;
@@ -12,6 +15,7 @@ export interface AOPContext {
     timeout?: number;
     retry?: number;
     cache?: CacheOptions;
+    circuitBreaker?: CircuitBreakerOptions;
 }
 
 export function wrapWithAOP<T extends object>(instance: T, token: Constructor<T>): T {
@@ -28,7 +32,7 @@ export function wrapWithAOP<T extends object>(instance: T, token: Constructor<T>
             const timeout = TIMEOUT.get(proto, propKey);
             const cache = CACHE.get(proto, propKey);
             const retry = RETRY.get(proto, propKey);
-
+            const circuitBreaker = CIRCUITBREAKER.get(proto, propKey);
             if (timeout === undefined && cache === undefined && retry === undefined) {
                 return original.bind(target);
             }
@@ -42,7 +46,8 @@ export function wrapWithAOP<T extends object>(instance: T, token: Constructor<T>
                     className: token.name,
                     timeout,
                     cache,
-                    retry
+                    retry,
+                    circuitBreaker
                 })
             }
         }
@@ -57,12 +62,24 @@ export async function executeWithAOP(ctx: AOPContext) {
         method,
         args,
         timeout,
+        className,
+        methodName,
         retry,
-        cache
+        cache,
+        circuitBreaker
     } = ctx;
 
+    const circuitKey = `${className}-${methodName}`
+    if (circuitBreaker) {
+        const { failureThreshold = 5, resetTimeout = 30000 } = circuitBreaker;
+        const { allowed, reason } = circuitBreakerManager.canExecute(circuitKey, resetTimeout);
+        if (!allowed) {
+            throw new CircuitOpenError(reason!);
+        }
+    }
+
     const cacheKey = cache
-        ? (cache.key ?? `${ctx.className}:${ctx.methodName}:${JSON.stringify(args)}`)
+        ? (cache.key ?? `${className}:${methodName}:${JSON.stringify(args)}`)
         : null;
     if (cacheKey && cacheManager.has(cacheKey)) {
         return cacheManager.get(cacheKey);
@@ -79,13 +96,28 @@ export async function executeWithAOP(ctx: AOPContext) {
         return withTimeout(promise, timeout)
     }
 
-    const result = retry !== undefined ? await withRetry(execute, retry) : await execute();
+    try {
 
-    if (cacheKey && cache) {
-        cacheManager.set(cacheKey, result, cache.ttl);
+
+        const result = retry !== undefined ? await withRetry(execute, retry) : await execute();
+
+        if (circuitBreaker) {
+            circuitBreakerManager.recordSuccess(circuitKey);
+        }
+        if (cacheKey && cache) {
+            cacheManager.set(cacheKey, result, cache.ttl);
+        }
+
+        return result;
+    } catch (error) {
+        if (circuitBreaker) {
+            const { failureThreshold = 5 } = circuitBreaker;
+            circuitBreakerManager.recordFailure(circuitKey, failureThreshold)
+        }
+
+        throw error;
     }
 
-    return result;
 }
 
 async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
