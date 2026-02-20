@@ -1,7 +1,6 @@
 import { Constructor } from "../core/container/container";
-import { metadata } from "../routing/metadata";
+import { Interceptor } from "../interceptors/Interceptor";
 import { INTERCEPTORS } from "../routing/metadataKeys";
-import { Interceptor } from "./applyInterceptor";
 export type ClassOrPrototype = Constructor | Record<string, any>;
 export function UseInterceptor(interceptor: Constructor<Interceptor>) {
     return function (
