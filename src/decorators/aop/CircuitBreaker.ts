@@ -1,4 +1,4 @@
-import { CIRCUITBREAKER } from "../routing/metadataKeys";
+import { CIRCUITBREAKER } from "../../routing/metadataKeys";
 
 export interface CircuitBreakerOptions {
     failureThreshold?: number //retry times

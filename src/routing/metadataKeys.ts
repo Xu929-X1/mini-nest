@@ -1,10 +1,10 @@
 import { MetadataKey } from '../utils/metadataKey';
 import { Constructor } from '../core/container/container';
-import { Guard } from '../guards/guard';
-import { Interceptor } from '../interceptor/applyInterceptor';
 import { ParamMetadata } from './paramTypes';
-import { CacheOptions } from '../decorators/cache';
-import { CircuitBreakerOptions } from '../decorators/circuitBreaker';
+import { CircuitBreakerOptions } from '../decorators/aop/CircuitBreaker';
+import { CacheOptions } from '../decorators/aop/Cache';
+import { Interceptor } from '../interceptors/Interceptor';
+import { Guard } from '../guards/Guard';
 export const INTERCEPTOR_KEY = Symbol("mini-nest:interceptor");
 export const GUARD_KEY = Symbol("mini-nest:guards");
 export const PARAM_KEY = Symbol("mini-nest:params");

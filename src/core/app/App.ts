@@ -5,7 +5,7 @@ import { OnAppBootstrap, OnAppShutdown } from "../../lifecycle/lifecycle";
 import { Log } from "../../utils/log";
 import { RequestPipeline } from "../pipeline/RequestPipeline";
 import { HttpAdapter } from "../../http/adapters/httpAdapter";
-import { RawRequest } from "../../http/httpRequest";
+import { RawRequest } from "../../http/HttpRequest";
 export type HTTPAdapter = "express" | "not-supported"; //we'll support more later, possibly.. :)
 export type AppOptions = {
     port?: number,

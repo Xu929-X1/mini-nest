@@ -2,8 +2,8 @@ import { cacheManager } from "../cache/cacheManager";
 import { circuitBreakerManager } from "../circuitBreaker/circuitBreakerManager";
 import { CircuitOpenError } from "../circuitBreaker/circuitOpenError";
 import { Constructor } from "../core/container/container";
-import { CacheOptions } from "../decorators/cache";
-import { CircuitBreakerOptions } from "../decorators/circuitBreaker";
+import { CacheOptions } from "../decorators/aop/Cache";
+import { CircuitBreakerOptions } from "../decorators/aop/CircuitBreaker";
 import { CACHE, CIRCUITBREAKER, RETRY, TIMEOUT } from "../routing/metadataKeys";
 
 export interface AOPContext {

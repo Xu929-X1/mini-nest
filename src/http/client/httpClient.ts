@@ -1,6 +1,6 @@
 import { request } from "undici";
 import { Injectable } from "../../decorators/Injectable";
-import { HttpMethod } from "../httpRequest";
+import { HttpMethod } from "../HttpRequest";
 import { Log } from "../../utils/log";
 
 export interface RequestOptions {

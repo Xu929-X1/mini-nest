@@ -1,8 +1,8 @@
-import { ParamMetadata } from "../routing/paramTypes";
+import { ParamMetadata } from "../../routing/paramTypes";
 import "reflect-metadata";
-import { RuleBuilder, Validator } from "../validation/rule";
-import { Log } from "../utils/log";
-import { PARAMS } from "../routing/metadataKeys";
+import { RuleBuilder, Validator } from "../../validation/rule";
+import { Log } from "../../utils/log";
+import { PARAMS } from "../../routing/metadataKeys";
 export const PARAM_KEY = "mini-nest:param"
 type ParamOptions = {
     key?: string,

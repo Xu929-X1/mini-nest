@@ -1,7 +1,7 @@
 import { Constructor, Container } from "../core/container/container";
 import { ExecutionContext } from "../core/pipeline/ExecutionContext";
 import { ForbiddenException } from "../exceptions";
-import { Guard } from "./guard";
+import { Guard } from "./Guard";
 
 export async function applyGuards(
     guards: Constructor<Guard>[],

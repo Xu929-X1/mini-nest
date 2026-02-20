@@ -1,8 +1,8 @@
 import { Container } from "../container/container";
 import { exceptionHandler } from "../../exceptions";
-import { HttpRequest, RawRequest } from "../../http/httpRequest";
-import { HttpResponse } from "../../http/httpResponse";
-import { applyInterceptors } from "../../interceptor/applyInterceptor";
+import { HttpRequest, RawRequest } from "../../http/HttpRequest";
+import { HttpResponse } from "../../http/HttpResponse";
+import { applyInterceptors } from "../../interceptors/applyInterceptor";
 import { metadata } from "../../routing/metadata";
 import { resolveHandlerArguments } from "../../validation/resolveHandlerArgument";
 import { routeRegistryTrie } from "../../routing/routeRegistry";

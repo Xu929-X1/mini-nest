@@ -3,7 +3,7 @@ import express, { Express } from "express";
 import * as http from "http";
 import * as fs from "fs";
 import * as https from "https";
-import { HttpMethod } from "../httpRequest";
+import { HttpMethod } from "../HttpRequest";
 
 export interface ExpressAdapterOptions {
     https?: {

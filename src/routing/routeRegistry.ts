@@ -1,6 +1,6 @@
 import { Constructor } from "../core/container/container";
 import { Middleware } from "../middleware/type";
-import { HttpMethod, HttpRequest } from "../http/httpRequest";
+import { HttpMethod, HttpRequest } from "../http/HttpRequest";
 
 export type RouteMetadataType = {
     method: string;

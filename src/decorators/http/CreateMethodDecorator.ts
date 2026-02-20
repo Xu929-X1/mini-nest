@@ -1,6 +1,6 @@
-import { Constructor } from "../core/container/container";
-import { HttpMethod } from "../http/httpRequest";
-import { metadata } from "../routing/metadata";
+import { Constructor } from "../../core/container/container";
+import { HttpMethod } from "../../http/HttpRequest";
+import { metadata } from "../../routing/metadata";
 
 function createMethodDecorator(method: HttpMethod) {
     return function (url: string) {

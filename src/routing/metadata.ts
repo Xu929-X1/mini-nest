@@ -1,12 +1,11 @@
 import { Constructor } from '../core/container/container';
 import { RouteMetadataType, routeRegistryTrie } from './routeRegistry';
 import { ParamMetadata } from './paramTypes';
-import {
-  Interceptor,
-} from '../interceptor/applyInterceptor';
-import { HttpMethod } from '../http/httpRequest';
+
+import { HttpMethod } from '../http/HttpRequest';
 import { GUARDS, INTERCEPTORS, PARAMS } from './metadataKeys';
-import { Guard } from '../guards/guard';
+import { Guard } from '../guards/Guard';
+import { Interceptor } from '../interceptors/Interceptor';
 //temp hash map
 const routeMetaData = new Map<Constructor, RouteMetadataType[]>();
 export const metadata = {

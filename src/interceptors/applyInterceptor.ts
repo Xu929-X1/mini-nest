@@ -1,9 +1,5 @@
 import { Constructor, Container } from "../core/container/container";
-export interface Interceptor {
-    intercept(next: () => Promise<unknown> | unknown): Promise<unknown> | unknown;
-}
-
-
+import { Interceptor } from "./Interceptor";
 export function resolveController(target: any): Constructor {
     return typeof target === 'function' ? target : target.constructor;
 }

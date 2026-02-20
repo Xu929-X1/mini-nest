@@ -1,4 +1,4 @@
-import { CACHE } from "../routing/metadataKeys";
+import { CACHE } from "../../routing/metadataKeys";
 
 export interface CacheOptions {
     ttl: number,

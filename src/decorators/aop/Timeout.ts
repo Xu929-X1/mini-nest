@@ -1,4 +1,4 @@
-import { TIMEOUT } from "../routing/metadataKeys"
+import { TIMEOUT } from "../../routing/metadataKeys"
 
 export function Timeout(ms: number): MethodDecorator {
     return function (target: Object, propertyKey: string | symbol) {
