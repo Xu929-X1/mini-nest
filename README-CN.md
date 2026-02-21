@@ -1,57 +1,56 @@
 # mini-nest
 
-A lightweight, NestJS-inspired BFF (Backend-for-Frontend) framework for Node.js.
+一个轻量级、受 NestJS 启发的 BFF（Backend-for-Frontend）Node.js 框架。
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![Test Coverage](https://img.shields.io/badge/coverage-92.5%25-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-English | [中文](README-CN.md)
+[English](./README.md) | 中文
 
-## Features
+## 特性
 
-- 🎯 **Decorator-based** - Familiar NestJS-style decorators
-- 💉 **Dependency Injection** - Automatic constructor injection
-- 🛡️ **Guards & Interceptors** - Request pipeline control
-- ⚡ **AOP Decorators** - `@Cache`, `@Retry`, `@Timeout`, `@CircuitBreaker`
-- 🔗 **HTTP Client** - Built-in client with `aggregate()` for BFF patterns
-- 🌳 **Trie-based Routing** - Fast route matching with params
-- 🔄 **Lifecycle Hooks** - `onModuleInit`, `onModuleDestroy`, etc.
-- 📦 **Lightweight** - Minimal dependencies, ~65% Express performance
+- 🎯 **装饰器驱动** - 熟悉的 NestJS 风格装饰器
+- 💉 **依赖注入** - 自动构造函数注入
+- 🛡️ **守卫与拦截器** - 请求管道控制
+- ⚡ **AOP 装饰器** - `@Cache`、`@Retry`、`@Timeout`、`@CircuitBreaker`
+- 🔗 **HTTP 客户端** - 内置客户端，支持 `aggregate()` BFF 聚合模式
+- 🌳 **Trie 路由** - 基于前缀树的快速路由匹配
+- 🔄 **生命周期钩子** - `onModuleInit`、`onModuleDestroy` 等
+- 📦 **轻量级** - 最小依赖，达到原生框架 ~90% 性能
 
+## 设计边界
 
-## Design Boundaries
+mini-nest 刻意保持轻量。以下是它**支持**和**不支持**的功能：
 
-mini-nest is intentionally lightweight. Here's what it **does** and **doesn't** do:
+| 功能 | 状态 | 说明 |
+|------|------|------|
+| 单例 DI | ✅ | 暂不支持请求作用域 |
+| 静态路由 | ✅ | 不支持正则/通配符 |
+| JSON API | ✅ | 不内置流式/multipart |
+| 单租户 | ✅ | 多租户需手动处理 |
+| 装饰器驱动 | ✅ | 不支持运行时动态注册 |
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Singleton DI | ✅ | No request-scope support yet |
-| Static routing | ✅ | No regex/wildcard patterns |
-| JSON API | ✅ | No streaming/multipart built-in |
-| Single-tenant | ✅ | Multi-tenant needs manual handling |
-| Decorator-based | ✅ | No runtime route registration |
+**适合场景：**
+- BFF（Backend-for-Frontend）聚合层
+- 中小型 API 服务
+- 熟悉 NestJS 的团队
+- 追求简洁的项目
 
-**Best for:**
-- BFF (Backend-for-Frontend) layers
-- Small to medium APIs
-- Teams familiar with NestJS patterns
-- Projects prioritizing simplicity over features
+**不太适合：**
+- 需要模块隔离的大型单体
+- 实时流式应用
+- 多租户 SaaS（需额外开发）
+- 需要请求级 DI 作用域的项目
 
-**Not ideal for:**
-- Large monoliths needing module isolation
-- Real-time streaming applications
-- Multi-tenant SaaS (without custom work)
-- Projects requiring request-scoped DI
-
-## Installation
+## 安装
 
 ```bash
 npm install mini-nest
 ```
 
-## Quick Start
+## 快速开始
 
 ```typescript
 import 'reflect-metadata';
@@ -79,12 +78,12 @@ const app = createMiniNestApp({
     controllers: [UserController],
 });
 
-app.listen(() => console.log('Server running on http://localhost:3000'));
+app.listen(() => console.log('服务运行在 http://localhost:3000'));
 ```
 
-## Documentation
+## 文档
 
-### Controllers & Routes
+### 控制器与路由
 
 ```typescript
 import { Controller, Get, Post, Put, Delete, Patch } from 'mini-nest';
@@ -118,7 +117,7 @@ class UserController {
 }
 ```
 
-### Parameter Decorators
+### 参数装饰器
 
 ```typescript
 import { Body, Query, Param, Header } from 'mini-nest';
@@ -127,18 +126,18 @@ import { Body, Query, Param, Header } from 'mini-nest';
 class ExampleController {
     @Post('/search')
     search(
-        @Body() body: any,                    // Full body
-        @Body('query') query: string,         // Specific field
-        @Query('page') page: string,          // Query param
-        @Param('id') id: string,              // Route param
-        @Header('authorization') auth: string // Header
+        @Body() body: any,                    // 完整请求体
+        @Body('query') query: string,         // 指定字段
+        @Query('page') page: string,          // 查询参数
+        @Param('id') id: string,              // 路由参数
+        @Header('authorization') auth: string // 请求头
     ) {
         return { body, query, page, id, auth };
     }
 }
 ```
 
-### Dependency Injection
+### 依赖注入
 
 ```typescript
 import { Injectable } from 'mini-nest';
@@ -169,7 +168,7 @@ class UserService {
 }
 ```
 
-### Guards
+### 守卫
 
 ```typescript
 import { Injectable, Guard, UseGuard, ExecutionContext } from 'mini-nest';
@@ -193,7 +192,7 @@ class AdminController {
 }
 ```
 
-### Interceptors
+### 拦截器
 
 ```typescript
 import { Injectable, Interceptor, UseInterceptor } from 'mini-nest';
@@ -201,9 +200,9 @@ import { Injectable, Interceptor, UseInterceptor } from 'mini-nest';
 @Injectable()
 class LoggingInterceptor implements Interceptor {
     async intercept(next: () => Promise<unknown>) {
-        console.log('Before...');
+        console.log('请求前...');
         const result = await next();
-        console.log('After...');
+        console.log('请求后...');
         return result;
     }
 }
@@ -227,16 +226,16 @@ class ApiController {
 }
 ```
 
-### AOP Decorators
+### AOP 装饰器
 
-#### @Cache
+#### @Cache（缓存）
 
 ```typescript
 import { Cache } from 'mini-nest';
 
 @Injectable()
 class DataService {
-    @Cache({ ttl: 60 })  // Cache for 60 seconds
+    @Cache({ ttl: 60 })  // 缓存 60 秒
     getExpensiveData() {
         return computeExpensiveOperation();
     }
@@ -248,35 +247,35 @@ class DataService {
 }
 ```
 
-#### @Retry
+#### @Retry（重试）
 
 ```typescript
 import { Retry } from 'mini-nest';
 
 @Injectable()
 class ExternalApiService {
-    @Retry(3)  // Retry up to 3 times with exponential backoff
+    @Retry(3)  // 最多重试 3 次，指数退避
     async fetchData() {
         return await fetch('https://api.example.com/data');
     }
 }
 ```
 
-#### @Timeout
+#### @Timeout（超时）
 
 ```typescript
 import { Timeout } from 'mini-nest';
 
 @Injectable()
 class SlowService {
-    @Timeout(5000)  // Timeout after 5 seconds
+    @Timeout(5000)  // 5 秒超时
     async slowOperation() {
         return await longRunningTask();
     }
 }
 ```
 
-#### @CircuitBreaker
+#### @CircuitBreaker（熔断器）
 
 ```typescript
 import { CircuitBreaker } from 'mini-nest';
@@ -284,8 +283,8 @@ import { CircuitBreaker } from 'mini-nest';
 @Injectable()
 class RiskyService {
     @CircuitBreaker({ 
-        failureThreshold: 5,  // Open after 5 failures
-        resetTimeout: 30000   // Try again after 30s
+        failureThreshold: 5,  // 5 次失败后熔断
+        resetTimeout: 30000   // 30 秒后尝试恢复
     })
     async callExternalService() {
         return await externalApi.call();
@@ -293,9 +292,9 @@ class RiskyService {
 }
 ```
 
-### HttpClient
+### HTTP 客户端
 
-Built-in HTTP client with retry, timeout, and aggregation support:
+内置 HTTP 客户端，支持重试、超时和聚合：
 
 ```typescript
 import { Injectable, HttpClient } from 'mini-nest';
@@ -316,9 +315,9 @@ class ApiService {
 }
 ```
 
-#### Aggregate (BFF Pattern)
+#### Aggregate（BFF 聚合模式）
 
-Combine multiple API calls into a single response:
+将多个 API 调用合并为单个响应：
 
 ```typescript
 @Injectable()
@@ -341,7 +340,7 @@ class BffService {
                 followerCount: sources.followers.length,
             }),
             timeout: 5000,
-            partial: true,  // Continue even if some requests fail
+            partial: true,  // 部分失败时继续返回
         });
 
         return data;
@@ -349,7 +348,7 @@ class BffService {
 }
 ```
 
-### Lifecycle Hooks
+### 生命周期钩子
 
 ```typescript
 import { Injectable, OnInit, OnDestroy } from 'mini-nest';
@@ -358,19 +357,19 @@ import { Injectable, OnInit, OnDestroy } from 'mini-nest';
 class DatabaseService implements OnInit, OnDestroy {
     private connection: any;
 
-    OnInit() {
-        console.log('Connecting to database...');
+    onInit() {
+        console.log('连接数据库...');
         this.connection = createConnection();
     }
 
-    OnDestroy() {
-        console.log('Closing database connection...');
+    onDestory() {
+        console.log('关闭数据库连接...');
         this.connection.close();
     }
 }
 ```
 
-### Validation
+### 参数验证
 
 ```typescript
 import { Query, Body, rule } from 'mini-nest';
@@ -407,7 +406,7 @@ class ValidationController {
 }
 ```
 
-### Exception Handling
+### 异常处理
 
 ```typescript
 import { 
@@ -424,14 +423,14 @@ class UserController {
     getUser(@Param('id') id: string) {
         const user = findUser(id);
         if (!user) {
-            throw new NotFoundException(`User ${id} not found`);
+            throw new NotFoundException(`用户 ${id} 不存在`);
         }
         return user;
     }
 }
 ```
 
-Custom exception filter:
+自定义异常过滤器：
 
 ```typescript
 import { ExceptionFilter, ExecutionContext } from 'mini-nest';
@@ -451,105 +450,104 @@ class CustomExceptionFilter implements ExceptionFilter {
 }
 ```
 
-## Configuration
+## 配置
 
 ```typescript
 const app = createMiniNestApp({
     port: 3000,
-    adapter: 'express' | 'fastify',  
+    adapter: 'express' | 'fastify',  // 支持 Express 和 Fastify
     controllers: [UserController, PostController],
-    https: {             // Optional HTTPS
+    https: {             // 可选 HTTPS
         key: '/path/to/key.pem',
         cert: '/path/to/cert.pem',
     },
 });
 ```
 
-## Benchmark
+## 性能测试
 
-Compared against Express and Fastify (10s, 100 connections):
+与 Express 和 Fastify 对比（10 秒，100 连接）：
 
-
-| Framework | Requests | Relative |
-|-----------|----------|----------|
-| Fastify (raw) | 2,544,032 | 100% |
-| mini-nest + Fastify | 2,290,571 | 90.0% |
-| Express (raw) | 1,742,452 | 68.5% |
+| 框架 | 请求数 | 相对性能 |
+|------|--------|----------|
+| Fastify（原生） | 2,544,032 | 100% |
+| **mini-nest + Fastify** | **2,290,571** | **90.0%** |
+| Express（原生） | 1,742,452 | 68.5% |
 | mini-nest + Express | 1,739,737 | 68.4% |
 
-mini-nest performs comparably to Express while providing:
-- Dependency Injection
-- Decorator-based routing
-- AOP features (Cache, Retry, Timeout, CircuitBreaker)
-- Guards & Interceptors
-- Built-in HTTP client with aggregation
+**mini-nest + Fastify** 达到原生 Fastify 90% 的性能，同时提供：
+- 依赖注入
+- 装饰器路由
+- AOP 功能（缓存、重试、超时、熔断）
+- 守卫与拦截器
+- 内置 HTTP 客户端聚合
 
-Run benchmarks locally:
+本地运行性能测试：
 
 ```bash
 npm run benchmark
 ```
 
-## Project Structure
+## 项目结构
 
 ```
 src/
 ├── core/
-│   ├── app/           # Application bootstrap
-│   ├── container/     # DI container
-│   └── pipeline/      # Request pipeline
+│   ├── app/           # 应用启动
+│   ├── container/     # DI 容器
+│   └── pipeline/      # 请求管道
 ├── decorators/
-│   ├── http/          # @Controller, @Get, @Post, etc.
+│   ├── http/          # @Controller, @Get, @Post 等
 │   └── aop/           # @Cache, @Retry, @Timeout, @CircuitBreaker
 ├── http/
-│   ├── adapters/      # Express and Fastify adapter
+│   ├── adapters/      # Express 和 Fastify 适配器
 │   └── client/        # HttpClient
-├── guards/            # Guard system
-├── interceptors/      # Interceptor system
-├── exceptions/        # Exception handling
-├── routing/           # Trie-based router
-├── validation/        # Parameter validation
-└── lifecycle/         # Lifecycle hooks
+├── guards/            # 守卫系统
+├── interceptors/      # 拦截器系统
+├── exceptions/        # 异常处理
+├── routing/           # Trie 路由
+├── validation/        # 参数验证
+└── lifecycle/         # 生命周期钩子
 ```
 
-## Requirements
+## 环境要求
 
 - Node.js 18+
 - TypeScript 5.0+
 - `experimentalDecorators: true`
 - `emitDecoratorMetadata: true`
 
-tsconfig.json:
+tsconfig.json 配置：
 
 ```json
 {
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "experimentalDecorators": true, //very important
-    "emitDecoratorMetadata": true, //very important
+    "experimentalDecorators": true,  // 必须开启
+    "emitDecoratorMetadata": true,   // 必须开启
     "esModuleInterop": true,
     "strict": true
   }
 }
 ```
 
-## Testing
+## 测试
 
 ```bash
-# Run tests
+# 运行测试
 npm test
 
-# Run with coverage
+# 运行覆盖率测试
 npm run test:coverage
 ```
 
-## Roadmap
+## 路线图
 
-- [ ] Module system (`@Module()`)
-- [ ] WebSocket support
-- [ ] OpenAPI/Swagger generation
-- [ ] CLI tool
+- [ ] 模块系统（`@Module()`）
+- [ ] WebSocket 支持
+- [ ] OpenAPI/Swagger 生成
+- [ ] CLI 工具
 
 ## License
 
