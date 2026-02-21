@@ -1,195 +1,528 @@
 # mini-nest
 
-A lightweight, educational Node.js framework inspired by [NestJS](https://nestjs.com), written in TypeScript. It implements constructor-based Dependency Injection (DI), decorator-driven routing, and a simplified controller system—all without relying on Express or HTTP servers.
+A lightweight, NestJS-inspired BFF (Backend-for-Frontend) framework for Node.js.
 
----
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![Test Coverage](https://img.shields.io/badge/coverage-92.5%25-brightgreen.svg)]()
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## ✨ Features
+## Features
 
-- ⚙️ Constructor-based dependency injection system
-- 🧩 Decorator support: `@Injectable()`, `@Controller()`, `@Get()` etc.
-- 📦 Centralized route registry
-- 🧪 Simulated HTTP-like request dispatch (`simulateRequest`)
-- 📚 Designed to help understand framework internals
+- 🎯 **Decorator-based** - Familiar NestJS-style decorators
+- 💉 **Dependency Injection** - Automatic constructor injection
+- 🛡️ **Guards & Interceptors** - Request pipeline control
+- ⚡ **AOP Decorators** - `@Cache`, `@Retry`, `@Timeout`, `@CircuitBreaker`
+- 🔗 **HTTP Client** - Built-in client with `aggregate()` for BFF patterns
+- 🌳 **Trie-based Routing** - Fast route matching with params
+- 🔄 **Lifecycle Hooks** - `onModuleInit`, `onModuleDestroy`, etc.
+- 📦 **Lightweight** - Minimal dependencies, ~65% Express performance
 
----
-
-## Getting Started
-
-### 1. Install dependencies
-
-```bash
-npm install
-```
-### 2. Build the project
+## Installation
 
 ```bash
-npm run build
+npm install mini-nest
 ```
 
-### 3. Run Examples
+## Quick Start
 
-Examples are in example directory, if you want, for example, run user service/controller example: 
+```typescript
+import 'reflect-metadata';
+import { createMiniNestApp, Controller, Get, Injectable, Param } from 'mini-nest';
+
+@Injectable()
+class UserService {
+    getUser(id: string) {
+        return { id, name: 'Alice' };
+    }
+}
+
+@Controller('/api/users')
+class UserController {
+    constructor(private userService: UserService) {}
+
+    @Get('/:id')
+    getUser(@Param('id') id: string) {
+        return this.userService.getUser(id);
+    }
+}
+
+const app = createMiniNestApp({
+    port: 3000,
+    controllers: [UserController],
+});
+
+app.listen(() => console.log('Server running on http://localhost:3000'));
+```
+
+## Documentation
+
+### Controllers & Routes
+
+```typescript
+import { Controller, Get, Post, Put, Delete, Patch } from 'mini-nest';
+
+@Controller('/api/users')
+class UserController {
+    @Get('/')
+    findAll() {
+        return [];
+    }
+
+    @Get('/:id')
+    findOne(@Param('id') id: string) {
+        return { id };
+    }
+
+    @Post('/')
+    create(@Body() data: any) {
+        return data;
+    }
+
+    @Put('/:id')
+    update(@Param('id') id: string, @Body() data: any) {
+        return { id, ...data };
+    }
+
+    @Delete('/:id')
+    remove(@Param('id') id: string) {
+        return { deleted: id };
+    }
+}
+```
+
+### Parameter Decorators
+
+```typescript
+import { Body, Query, Param, Header } from 'mini-nest';
+
+@Controller('/api')
+class ExampleController {
+    @Post('/search')
+    search(
+        @Body() body: any,                    // Full body
+        @Body('query') query: string,         // Specific field
+        @Query('page') page: string,          // Query param
+        @Param('id') id: string,              // Route param
+        @Header('authorization') auth: string // Header
+    ) {
+        return { body, query, page, id, auth };
+    }
+}
+```
+
+### Dependency Injection
+
+```typescript
+import { Injectable } from 'mini-nest';
+
+@Injectable()
+class DatabaseService {
+    query(sql: string) {
+        return [{ id: 1 }];
+    }
+}
+
+@Injectable()
+class UserRepository {
+    constructor(private db: DatabaseService) {}
+
+    findAll() {
+        return this.db.query('SELECT * FROM users');
+    }
+}
+
+@Injectable()
+class UserService {
+    constructor(private repo: UserRepository) {}
+
+    getUsers() {
+        return this.repo.findAll();
+    }
+}
+```
+
+### Guards
+
+```typescript
+import { Injectable, Guard, UseGuard, ExecutionContext } from 'mini-nest';
+
+@Injectable()
+class AuthGuard implements Guard {
+    canActivate(ctx: ExecutionContext): boolean {
+        const request = ctx.getRequest();
+        const token = request.header('authorization');
+        return token === 'Bearer valid-token';
+    }
+}
+
+@Controller('/api/admin')
+class AdminController {
+    @Get('/dashboard')
+    @UseGuard([AuthGuard])
+    getDashboard() {
+        return { data: 'secret' };
+    }
+}
+```
+
+### Interceptors
+
+```typescript
+import { Injectable, Interceptor, UseInterceptor } from 'mini-nest';
+
+@Injectable()
+class LoggingInterceptor implements Interceptor {
+    async intercept(next: () => Promise<unknown>) {
+        console.log('Before...');
+        const result = await next();
+        console.log('After...');
+        return result;
+    }
+}
+
+@Injectable()
+class TransformInterceptor implements Interceptor {
+    async intercept(next: () => Promise<unknown>) {
+        const result = await next();
+        return { data: result, timestamp: Date.now() };
+    }
+}
+
+@Controller('/api')
+@UseInterceptor(LoggingInterceptor)
+class ApiController {
+    @Get('/data')
+    @UseInterceptor(TransformInterceptor)
+    getData() {
+        return { message: 'Hello' };
+    }
+}
+```
+
+### AOP Decorators
+
+#### @Cache
+
+```typescript
+import { Cache } from 'mini-nest';
+
+@Injectable()
+class DataService {
+    @Cache({ ttl: 60 })  // Cache for 60 seconds
+    getExpensiveData() {
+        return computeExpensiveOperation();
+    }
+
+    @Cache({ ttl: 300, key: 'custom-key' })
+    getWithCustomKey() {
+        return data;
+    }
+}
+```
+
+#### @Retry
+
+```typescript
+import { Retry } from 'mini-nest';
+
+@Injectable()
+class ExternalApiService {
+    @Retry(3)  // Retry up to 3 times with exponential backoff
+    async fetchData() {
+        return await fetch('https://api.example.com/data');
+    }
+}
+```
+
+#### @Timeout
+
+```typescript
+import { Timeout } from 'mini-nest';
+
+@Injectable()
+class SlowService {
+    @Timeout(5000)  // Timeout after 5 seconds
+    async slowOperation() {
+        return await longRunningTask();
+    }
+}
+```
+
+#### @CircuitBreaker
+
+```typescript
+import { CircuitBreaker } from 'mini-nest';
+
+@Injectable()
+class RiskyService {
+    @CircuitBreaker({ 
+        failureThreshold: 5,  // Open after 5 failures
+        resetTimeout: 30000   // Try again after 30s
+    })
+    async callExternalService() {
+        return await externalApi.call();
+    }
+}
+```
+
+### HttpClient
+
+Built-in HTTP client with retry, timeout, and aggregation support:
+
+```typescript
+import { Injectable, HttpClient } from 'mini-nest';
+
+@Injectable()
+class ApiService {
+    constructor(private http: HttpClient) {}
+
+    async getUser(id: string) {
+        const res = await this.http.get(`https://api.example.com/users/${id}`);
+        return res.data;
+    }
+
+    async createUser(data: any) {
+        const res = await this.http.post('https://api.example.com/users', data);
+        return res.data;
+    }
+}
+```
+
+#### Aggregate (BFF Pattern)
+
+Combine multiple API calls into a single response:
+
+```typescript
+@Injectable()
+class BffService {
+    constructor(private http: HttpClient) {}
+
+    async getUserProfile(userId: string) {
+        const { data, errors } = await this.http.aggregate({
+            baseUrl: 'https://api.example.com',
+            params: { id: userId },
+            sources: {
+                user: '/users/:id',
+                posts: '/users/:id/posts',
+                followers: '/users/:id/followers',
+            },
+            output: (sources) => ({
+                id: sources.user.id,
+                name: sources.user.name,
+                postCount: sources.posts.length,
+                followerCount: sources.followers.length,
+            }),
+            timeout: 5000,
+            partial: true,  // Continue even if some requests fail
+        });
+
+        return data;
+    }
+}
+```
+
+### Lifecycle Hooks
+
+```typescript
+import { Injectable, OnInit, OnDestroy, OnAppBootstrap, OnAppShutdown } from 'mini-nest';
+
+@Injectable()
+class DatabaseService implements OnInit, OnDestroy {
+    private connection: any;
+
+    onModuleInit() {
+        console.log('Connecting to database...');
+        this.connection = createConnection();
+    }
+
+    onModuleDestroy() {
+        console.log('Closing database connection...');
+        this.connection.close();
+    }
+}
+```
+
+### Validation
+
+```typescript
+import { Query, Body, rule } from 'mini-nest';
+
+@Controller('/api')
+class ValidationController {
+    @Get('/search')
+    search(
+        @Query({ 
+            key: 'page', 
+            validator: rule().required().min(1) 
+        }) 
+        page: number,
+
+        @Query({ 
+            key: 'email', 
+            validator: rule().required().pattern(/^[\w-]+@[\w-]+\.\w+$/) 
+        }) 
+        email: string
+    ) {
+        return { page, email };
+    }
+
+    @Post('/users')
+    createUser(
+        @Body({
+            key: 'name',
+            validator: rule().required().minLength(2).maxLength(50)
+        })
+        name: string
+    ) {
+        return { name };
+    }
+}
+```
+
+### Exception Handling
+
+```typescript
+import { 
+    NotFoundException, 
+    BadRequestException, 
+    UnauthorizedException,
+    ForbiddenException,
+    InternalServerErrorException 
+} from 'mini-nest';
+
+@Controller('/api/users')
+class UserController {
+    @Get('/:id')
+    getUser(@Param('id') id: string) {
+        const user = findUser(id);
+        if (!user) {
+            throw new NotFoundException(`User ${id} not found`);
+        }
+        return user;
+    }
+}
+```
+
+Custom exception filter:
+
+```typescript
+import { ExceptionFilter, ExecutionContext } from 'mini-nest';
+
+class CustomExceptionFilter implements ExceptionFilter {
+    canHandle(exception: unknown): boolean {
+        return exception instanceof CustomError;
+    }
+
+    catch(exception: CustomError, context: ExecutionContext) {
+        const response = context.getResponse();
+        response.status(400).json({
+            error: 'CustomError',
+            message: exception.message,
+        });
+    }
+}
+```
+
+## Configuration
+
+```typescript
+const app = createMiniNestApp({
+    port: 3000,
+    adapter: 'express',  // Currently only Express supported
+    controllers: [UserController, PostController],
+    https: {             // Optional HTTPS
+        key: '/path/to/key.pem',
+        cert: '/path/to/cert.pem',
+    },
+});
+```
+
+## Benchmark
+
+Compared against Express and Fastify (10s, 100 connections):
+
+| Framework | Requests | Relative |
+|-----------|----------|----------|
+| Fastify   | 2,539,505 | 100% |
+| Express   | 1,703,436 | 67.1% |
+| mini-nest | 1,664,204 | 65.5% |
+
+mini-nest performs comparably to Express while providing:
+- Dependency Injection
+- Decorator-based routing
+- AOP features (Cache, Retry, Timeout, CircuitBreaker)
+- Guards & Interceptors
+- Built-in HTTP client with aggregation
+
+Run benchmarks locally:
 
 ```bash
-node dist/examples/user.example.js
+npm run benchmark
 ```
 
-or use ts-node to run all examples directly: 
+## Project Structure
+
+```
+src/
+├── core/
+│   ├── app/           # Application bootstrap
+│   ├── container/     # DI container
+│   └── pipeline/      # Request pipeline
+├── decorators/
+│   ├── http/          # @Controller, @Get, @Post, etc.
+│   └── aop/           # @Cache, @Retry, @Timeout, @CircuitBreaker
+├── http/
+│   ├── adapters/      # Express adapter
+│   └── client/        # HttpClient
+├── guards/            # Guard system
+├── interceptors/      # Interceptor system
+├── exceptions/        # Exception handling
+├── routing/           # Trie-based router
+├── validation/        # Parameter validation
+└── lifecycle/         # Lifecycle hooks
+```
+
+## Requirements
+
+- Node.js 18+
+- TypeScript 5.0+
+- `experimentalDecorators: true`
+- `emitDecoratorMetadata: true`
+
+tsconfig.json:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "strict": true
+  }
+}
+```
+
+## Testing
 
 ```bash
-ts-node src/main.ts
+# Run tests
+npm test
+
+# Run with coverage
+npm run test:coverage
 ```
 
-I have a script defined already, this is equivalent to the previous command: 
+## Roadmap
 
-```bash
-npm run dev
-```
+- [ ] Fastify adapter (performance boost)
+- [ ] Module system (`@Module()`)
+- [ ] WebSocket support
+- [ ] OpenAPI/Swagger generation
+- [ ] CLI tool
 
-## 🔍 Roadmap
- 
-- Route parameters: /users/:id ✅
+## License
 
-- Request body decorators (@Body()) ✅
-
-- Parameter validation ✅
-
-- Life cycle hooks (WIP)
-
-- Exception Filter ✅
-
-- Validation Pipeline
-
-- Guards / Interceptors / Middleware (WIP)
-
-- Module organization (@Module)
-
-- Real HTTP server integration (e.g. Express/Fastify)
-
-## 🦅 High Level
-
-This is a server-side framework designed to help developers handle API requests in a structured and elegant way. From that perspective, understanding the lifecycle of a request is essential to grasp how the project is architected.
-
-### 🥾 Bootstrap 
-
-**Bootstrap** is the process of initializing the framework, registering metadata,
-and preparing the runtime environment **before any request is handled**.
-
-At the end of bootstrap, the application reaches a **stable state** where:
-- Routes are registered
-- Controllers and dependencies are instantiated
-- Global middleware / interceptors / guards are ready
-- The HTTP server is listening for incoming requests
-
-
-## High-Level Flow
-
-```text
-Create Application
-  ↓
-Load Modules & Metadata
-  ↓
-Instantiate Controllers & Providers
-  ↓
-Register Routes
-  ↓
-Initialize Global Pipeline
-  ↓
-Start HTTP Server
-```
-
-### Request Life Cycle     
-
-When a request enters this framework, this is what will happen: 
-
----
-
-### Phase 1: Request parsing and route matching
-
-- HTTP request enters the framework, the framework receives the request as:
-    - Raw HTTP request (method, headers, url, body)
-
-- URL parsing and normalization
-    - The framework parses the URL and extracts **path** and **query parameters**
-    - Request headers are normalized (header keys are converted to lower case)
-
-- Route matching
-    - The framework looks up the route registry using **method + path**
-    - The corresponding route handler and its metadata are resolved
-    - If no route is matched, the request is terminated with a `NotFound` error
-
----
-
-### Phase 2: Execution context preparation and pre-processing
-
-- Execution context creation
-    - An execution context is created for the current request
-    - The context contains:
-        - Request and response objects
-        - Matched route information
-        - Controller instance and handler reference
-        - Parameter and metadata definitions
-
-- Guards (authorization / access control)
-    - Guards are executed to determine whether the request is allowed to proceed
-    - If any guard denies the request, execution stops immediately
-
-- Parameter resolution
-    - Handler parameters are resolved from the execution context
-    - Supported parameter sources include:
-        - Path parameters
-        - Query parameters
-        - Request body
-        - Headers
-
-- Pipes (transformation and validation)
-    - Resolved parameters are passed through pipes
-    - Pipes may transform or validate parameter values
-    - If a pipe throws an error, request execution is terminated
-
----
-
-### Phase 3: Handler execution and interception
-
-- Interceptors (before execution)
-    - Interceptors are invoked before the handler is executed
-    - Interceptors may perform:
-        - Logging
-        - Timing
-        - Context modification
-        - Result wrapping
-
-- Handler execution
-    - The matched controller method is executed with resolved parameters
-    - The handler may return a value synchronously or asynchronously
-
-- Interceptors (after execution)
-    - Interceptors process the handler’s return value
-    - The result may be transformed or wrapped before being sent
-
----
-
-### Phase 4: Response mapping and completion
-
-- Response mapping
-    - The final result is mapped to an HTTP response
-    - Status code, headers, and response body are resolved by the framework
-
-- Response sent
-    - The HTTP response is sent back to the client
-    - The request life cycle ends
-
----
-
-### Error handling
-
-- Errors may be thrown at any phase of the request lifecycle
-- Thrown errors are captured and handled by the framework’s error handling layer
-- Errors are converted into appropriate HTTP responses
-
-
-
-
-## Credits
-Built with ❤️ by Xu929-X1 for learning and experimentation.
+MIT
