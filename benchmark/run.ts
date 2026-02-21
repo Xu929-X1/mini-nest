@@ -30,9 +30,11 @@ interface BenchmarkResult {
 const ROOT = resolve(__dirname, '..');
 
 const SERVERS: ServerConfig[] = [
-    { name: 'mini-nest', script: resolve(ROOT, 'benchmark/servers/mini-nest.ts'), port: 3000 },
-    { name: 'express', script: resolve(ROOT, 'benchmark/servers/express.ts'), port: 3001 },
-    { name: 'fastify', script: resolve(ROOT, 'benchmark/servers/fastify.ts'), port: 3002 },
+    { name: 'mini-nest-express', script: resolve(ROOT, 'benchmark/servers/mini-nest-express.ts'), port: 3000 },
+    { name: 'mini-nest-fastify', script: resolve(ROOT, 'benchmark/servers/mini-nest-fastify.ts'), port: 3001 },
+    { name: 'express', script: resolve(ROOT, 'benchmark/servers/express.ts'), port: 3002 },
+    { name: 'fastify', script: resolve(ROOT, 'benchmark/servers/fastify.ts'), port: 3003 },
+
 ];
 
 const ROUTES = [

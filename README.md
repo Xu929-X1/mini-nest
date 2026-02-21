@@ -429,7 +429,7 @@ class CustomExceptionFilter implements ExceptionFilter {
 ```typescript
 const app = createMiniNestApp({
     port: 3000,
-    adapter: 'express',  // Currently only Express supported
+    adapter: 'express' | 'fastify',  
     controllers: [UserController, PostController],
     https: {             // Optional HTTPS
         key: '/path/to/key.pem',
@@ -442,11 +442,13 @@ const app = createMiniNestApp({
 
 Compared against Express and Fastify (10s, 100 connections):
 
+
 | Framework | Requests | Relative |
 |-----------|----------|----------|
-| Fastify   | 2,539,505 | 100% |
-| Express   | 1,703,436 | 67.1% |
-| mini-nest | 1,664,204 | 65.5% |
+| Fastify (raw) | 2,544,032 | 100% |
+| mini-nest + Fastify | 2,290,571 | 90.0% |
+| Express (raw) | 1,742,452 | 68.5% |
+| mini-nest + Express | 1,739,737 | 68.4% |
 
 mini-nest performs comparably to Express while providing:
 - Dependency Injection
@@ -473,7 +475,7 @@ src/
 │   ├── http/          # @Controller, @Get, @Post, etc.
 │   └── aop/           # @Cache, @Retry, @Timeout, @CircuitBreaker
 ├── http/
-│   ├── adapters/      # Express adapter
+│   ├── adapters/      # Express and Fastify adapter
 │   └── client/        # HttpClient
 ├── guards/            # Guard system
 ├── interceptors/      # Interceptor system
@@ -497,8 +499,8 @@ tsconfig.json:
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true, //very important
+    "emitDecoratorMetadata": true, //very important
     "esModuleInterop": true,
     "strict": true
   }
@@ -517,7 +519,6 @@ npm run test:coverage
 
 ## Roadmap
 
-- [ ] Fastify adapter (performance boost)
 - [ ] Module system (`@Module()`)
 - [ ] WebSocket support
 - [ ] OpenAPI/Swagger generation

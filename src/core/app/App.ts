@@ -6,7 +6,7 @@ import { Log } from "../../utils/log";
 import { RequestPipeline } from "../pipeline/RequestPipeline";
 import { HttpAdapter } from "../../http/adapters/httpAdapter";
 import { RawRequest } from "../../http/HttpRequest";
-export type HTTPAdapter = "express" | "not-supported"; //we'll support more later, possibly.. :)
+export type HTTPAdapter = "express" | "fastify" | "not-supported"; //we'll support more later, possibly.. :)
 export type AppOptions = {
     port?: number,
     adapter?: HTTPAdapter,
@@ -42,14 +42,28 @@ export class App {
             case "express":
                 Log.info(`Starting ${protocol} server with Express adapter...`);
                 const { ExpressAdapter } = await import("../../http/adapters/expressAdapter");
-                const handler = async (raw: RawRequest) => {
+                const expressHandler = async (raw: RawRequest) => {
                     return await requestPipeline.handle(raw);
                 };
-                const adapter = new ExpressAdapter(handler, {
+                const expressAdapter = new ExpressAdapter(expressHandler, {
                     https: this.options.https,
                 });
-                this.server = adapter;
-                adapter.listen(port, cb);
+                this.server = expressAdapter;
+                expressAdapter.listen(port, cb);
+                Log.info(`Server is listening on port ${port}`);
+                break;
+
+            case "fastify":
+                Log.info(`Starting ${protocol} server with Fastify adapter...`);
+                const { FastifyAdapter } = await import("../../http/adapters/fastifyAdapter");
+                const fastifyHandler = async (raw: RawRequest) => {
+                    return await requestPipeline.handle(raw);
+                }
+                const fastifyAdapter = new FastifyAdapter(fastifyHandler, {
+                    https: this.options.https,
+                });
+                this.server = fastifyAdapter;
+                fastifyAdapter.listen(port, cb);
                 Log.info(`Server is listening on port ${port}`);
                 break;
             default:
