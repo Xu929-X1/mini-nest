@@ -9,5 +9,5 @@
     "esModuleInterop": true,
     "strict": true
   },
-  "include": ["./src/**/*", "./vitest.config.ts"],
+  "include": ["./src/**/*", "./vitest.config.ts", "./benchmark/**/*"],
 }
