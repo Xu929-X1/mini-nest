@@ -4,7 +4,10 @@
   "main": "index.ts",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "bff-example": "npx ts-node src/examples/bff-examples/app.ts"
+    "bff-example": "npx ts-node src/examples/bff-examples/app.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -20,11 +23,12 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.2.3",
-    "eslint": "^10.0.0",
+    "eslint": "^9.39.3",
     "husky": "^9.1.7",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.21.0",
-    "typescript-eslint": "^8.55.0"
+    "typescript-eslint": "^8.56.0",
+    "vitest": "^4.0.18"
   }
 }
