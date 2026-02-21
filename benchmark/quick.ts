@@ -5,14 +5,14 @@
  * 
  * Usage:
  *   1. Start a server in one terminal:
- *      npx tsx benchmark/servers/mini-nest.ts
- *      npx tsx benchmark/servers/express.ts  
- *      npx tsx benchmark/servers/fastify.ts
+ *      npx ts-node benchmark/servers/mini-nest.ts
+ *      npx ts-node benchmark/servers/express.ts  
+ *      npx ts-node benchmark/servers/fastify.ts
  * 
  *   2. Run benchmark in another terminal:
- *      npx tsx benchmark/quick.ts 3000
- *      npx tsx benchmark/quick.ts 3001
- *      npx tsx benchmark/quick.ts 3002
+ *      npx ts-node benchmark/quick.ts 3000
+ *      npx ts-node benchmark/quick.ts 3001
+ *      npx ts-node benchmark/quick.ts 3002
  */
 
 import autocannon from 'autocannon';
