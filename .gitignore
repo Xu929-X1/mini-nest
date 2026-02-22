@@ -36,3 +36,5 @@ Thumbs.db
 *.7z
 
 coverage/
+
+.npmrc

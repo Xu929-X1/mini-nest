@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Container } from '../core/container/container';
 import { Injectable, Cache } from '../decorators';
 import { OnInit, OnDestroy } from '../lifecycle/lifecycle';

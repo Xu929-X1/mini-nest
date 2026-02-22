@@ -1,0 +1,28 @@
+# Source
+src/
+
+# Tests
+*.test.ts
+test/
+coverage/
+
+# Benchmark
+benchmark/
+
+# Config files
+.eslintrc*
+eslint.config.*
+vitest.config.*
+tsconfig.json
+.prettierrc*
+
+# Development
+.git/
+.github/
+.vscode/
+node_modules/
+
+# Misc
+*.log
+*.md
+!README.md

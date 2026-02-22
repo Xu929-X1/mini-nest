@@ -17,8 +17,8 @@ English | [中文](README-CN.md)
 - ⚡ **AOP Decorators** - `@Cache`, `@Retry`, `@Timeout`, `@CircuitBreaker`
 - 🔗 **HTTP Client** - Built-in client with `aggregate()` for BFF patterns
 - 🌳 **Trie-based Routing** - Fast route matching with params
-- 🔄 **Lifecycle Hooks** - `onModuleInit`, `onModuleDestroy`, etc.
-- 📦 **Lightweight** - Minimal dependencies, ~65% Express performance
+- 🔄 **Lifecycle Hooks** - `OnInit`, `OnDestroy`, etc.
+- 📦 **Lightweight** - Minimal dependencies, ~65% Express performance, ~90% fastify performance
 
 
 ## Design Boundaries

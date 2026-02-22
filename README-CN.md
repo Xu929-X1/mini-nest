@@ -17,7 +17,7 @@
 - ⚡ **AOP 装饰器** - `@Cache`、`@Retry`、`@Timeout`、`@CircuitBreaker`
 - 🔗 **HTTP 客户端** - 内置客户端，支持 `aggregate()` BFF 聚合模式
 - 🌳 **Trie 路由** - 基于前缀树的快速路由匹配
-- 🔄 **生命周期钩子** - `onModuleInit`、`onModuleDestroy` 等
+- 🔄 **生命周期钩子** - `OnInit`、`onDestroy` 等
 - 📦 **轻量级** - 最小依赖，达到原生框架 ~90% 性能
 
 ## 设计边界
