@@ -1,0 +1,33 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # 只有推送 v1.0.0 这类 tag 才触发
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write 
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'  
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+      - name: Publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
