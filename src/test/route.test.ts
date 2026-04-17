@@ -1,7 +1,7 @@
 import 'reflect-metadata';
-import { describe, it, expect, beforeEach } from 'vitest';
-import { RouteMetadataType, routeRegistryTrie } from '../routing/routeRegistry';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { HttpMethod } from '../http/HttpRequest';
+import { RouteMetadataType, routeRegistryTrie } from '../routing/routeRegistry';
 
 
 // ============================================
@@ -18,7 +18,7 @@ function createRoute(
         url: fullUrl,
         fullUrl,
         handlerName,
-        controllerClass: class TestController {},
+        controllerClass: class TestController { },
     };
 }
 
@@ -115,14 +115,14 @@ describe('RouteRegistryTrie', () => {
             const result = routeRegistryTrie.findRoute('GET', '/users/123');
 
             expect(result).toBeDefined();
-            expect(result?.params).toEqual({ userId: '123' });
+            expect(result?.params).toEqual({ id: '123' });
         });
 
         it('should match param with nested path', () => {
             const result = routeRegistryTrie.findRoute('GET', '/users/456/posts');
 
             expect(result).toBeDefined();
-            expect(result?.params).toEqual({ userId: '456' });
+            expect(result?.params).toEqual({ id: '456' });
         });
 
         it('should match multiple params', () => {
@@ -136,7 +136,7 @@ describe('RouteRegistryTrie', () => {
             const result = routeRegistryTrie.findRoute('GET', '/users/alice');
 
             expect(result).toBeDefined();
-            expect(result?.params).toEqual({ userId: 'alice' });
+            expect(result?.params).toEqual({ id: 'alice' });
         });
 
         it('should handle special characters in params', () => {
@@ -225,6 +225,90 @@ describe('RouteRegistryTrie', () => {
             expect(routeRegistryTrie.findRoute('GET', '/users')).toBeUndefined();
             expect(routeRegistryTrie.findRoute('POST', '/users')).toBeUndefined();
             expect(routeRegistryTrie.findRoute('GET', '/posts')).toBeUndefined();
+        });
+    });
+
+    describe('findRoute - wildcard routes', () => {
+        beforeEach(() => {
+            routeRegistryTrie.addRoute('GET', createRoute('GET', '/assets/*', 'serveAsset'));
+            routeRegistryTrie.addRoute('GET', createRoute('GET', '/files/*/download', 'downloadFile'));
+            routeRegistryTrie.addRoute('GET', createRoute('GET', '/assets/logo.png', 'getLogo'));
+        });
+
+        it('should match single-segment wildcard', () => {
+            const result = routeRegistryTrie.findRoute('GET', '/assets/image.png');
+            expect(result).toBeDefined();
+            expect(result?.route.handlerName).toBe('serveAsset');
+        });
+
+        it('should not match wildcard across multiple segments', () => {
+            const result = routeRegistryTrie.findRoute('GET', '/assets/a/b');
+            expect(result).toBeUndefined();
+        });
+
+        it('should match wildcard in middle of path', () => {
+            const result = routeRegistryTrie.findRoute('GET', '/files/report.pdf/download');
+            expect(result).toBeDefined();
+            expect(result?.route.handlerName).toBe('downloadFile');
+        });
+
+        it('should prefer static over wildcard', () => {
+            const result = routeRegistryTrie.findRoute('GET', '/assets/logo.png');
+            expect(result).toBeDefined();
+            expect(result?.route.handlerName).toBe('getLogo');
+        });
+    });
+
+    describe('findRoute - greedy wildcard routes', () => {
+        beforeEach(() => {
+            routeRegistryTrie.addRoute('GET', createRoute('GET', '/api/**', 'catchAll'));
+            routeRegistryTrie.addRoute('GET', createRoute('GET', '/api/v1/users', 'getUsers'));
+        });
+
+        it('should match greedy wildcard over single segment', () => {
+            const result = routeRegistryTrie.findRoute('GET', '/api/anything');
+            expect(result).toBeDefined();
+            expect(result?.route.handlerName).toBe('catchAll');
+        });
+
+        it('should match greedy wildcard over multiple segments', () => {
+            const result = routeRegistryTrie.findRoute('GET', '/api/v2/users/123/posts');
+            expect(result).toBeDefined();
+            expect(result?.route.handlerName).toBe('catchAll');
+        });
+
+        it('should prefer static route over greedy wildcard', () => {
+            const result = routeRegistryTrie.findRoute('GET', '/api/v1/users');
+            expect(result).toBeDefined();
+            expect(result?.route.handlerName).toBe('getUsers');
+        });
+    });
+
+    describe('addRoute - greedy wildcard validation', () => {
+        it('should throw when ** is not at end of URL', () => {
+            expect(() => {
+                routeRegistryTrie.addRoute('GET', createRoute('GET', '/api/**/users'));
+            }).toThrow('Greedy wildcard pattern can only be used at end of the URL');
+        });
+    });
+
+    describe('deleteRoute - wildcard routes', () => {
+        it('should delete wildcard route', () => {
+            const route = createRoute('GET', '/assets/*');
+            routeRegistryTrie.addRoute('GET', route);
+            expect(routeRegistryTrie.findRoute('GET', '/assets/file.txt')).toBeDefined();
+
+            routeRegistryTrie.deleteRoute('GET', route);
+            expect(routeRegistryTrie.findRoute('GET', '/assets/file.txt')).toBeUndefined();
+        });
+
+        it('should delete greedy wildcard route', () => {
+            const route = createRoute('GET', '/api/**');
+            routeRegistryTrie.addRoute('GET', route);
+            expect(routeRegistryTrie.findRoute('GET', '/api/v1/users')).toBeDefined();
+
+            routeRegistryTrie.deleteRoute('GET', route);
+            expect(routeRegistryTrie.findRoute('GET', '/api/v1/users')).toBeUndefined();
         });
     });
 
