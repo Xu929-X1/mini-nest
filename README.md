@@ -16,7 +16,7 @@ English | [中文](README-CN.md)
 - 🛡️ **Guards & Interceptors** - Request pipeline control
 - ⚡ **AOP Decorators** - `@Cache`, `@Retry`, `@Timeout`, `@CircuitBreaker`
 - 🔗 **HTTP Client** - Built-in client with `aggregate()` for BFF patterns
-- 🌳 **Trie-based Routing** - Fast route matching with params
+- 🌳 **Trie-based Routing** - Fast route matching with params, wildcards (`*`), and greedy wildcards (`**`)
 - 🔄 **Lifecycle Hooks** - `OnInit`, `OnDestroy`, etc.
 - 📦 **Lightweight** - Minimal dependencies, ~65% Express performance, ~90% fastify performance
 
@@ -28,7 +28,7 @@ mini-nest is intentionally lightweight. Here's what it **does** and **doesn't** 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Singleton DI | ✅ | No request-scope support yet |
-| Static routing | ✅ | No regex/wildcard patterns |
+| Wildcard routing | ✅ | `*` single-segment, `**` greedy (no regex) |
 | JSON API | ✅ | No streaming/multipart built-in |
 | Single-tenant | ✅ | Multi-tenant needs manual handling |
 | Decorator-based | ✅ | No runtime route registration |
@@ -117,6 +117,34 @@ class UserController {
     }
 }
 ```
+
+### Wildcard Routes
+
+Use `*` to match a single path segment, or `**` to match all remaining segments:
+
+```typescript
+@Controller('/api')
+class FileController {
+    @Get('/assets/*')
+    serveAsset() {
+        // matches /api/assets/logo.png, /api/assets/style.css
+    }
+
+    @Get('/files/*/download')
+    downloadFile() {
+        // matches /api/files/report.pdf/download
+    }
+
+    @Get('/proxy/**')
+    proxyRequest() {
+        // matches /api/proxy/v1/users/123/posts — any depth
+    }
+}
+```
+
+Match priority per segment: **static > param (`:id`) > wildcard (`*`) > greedy (`**`)**
+
+> `**` must be the last segment — `@Get('/api/**/users')` throws at startup.
 
 ### Parameter Decorators
 
