@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*.*.*'   # 只有推送 v1.0.0 这类 tag 才触发
+  workflow_dispatch:
 
 jobs:
   publish:
