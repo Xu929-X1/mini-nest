@@ -38,3 +38,4 @@ Thumbs.db
 coverage/
 
 .npmrc
+.claude
