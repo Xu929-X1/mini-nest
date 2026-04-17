@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g. 1.0.5). Use at your own descretion, always check current version.'
+        description: 'Version to publish (e.g. 1.0.5). Use at your own discretion, always check current version.'
         required: true
 
 jobs:
