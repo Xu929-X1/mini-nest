@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { describe, it, expect, beforeEach } from 'vitest';
-import { Injectable, Body, Query, Param, Header } from '../decorators';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { Container } from '../core/container/container';
+import { Body, Header, Injectable, Param, Query } from '../decorators';
 import { resolveHandlerArguments } from '../validation/resolveHandlerArgument';
 import { rule } from '../validation/rule';
-import { Container } from '../core/container/container';
 
 // ============================================
 // Helpers
@@ -112,7 +112,7 @@ describe('resolveHandlerArguments', () => {
         it('should extract body', () => {
             @Injectable()
             class TestController {
-                handler(@Body() body: any) {}
+                handler(@Body() body: any) { }
             }
 
             const args = resolveHandlerArguments(
@@ -127,7 +127,7 @@ describe('resolveHandlerArguments', () => {
         it('should extract specific body field', () => {
             @Injectable()
             class TestController {
-                handler(@Body('name') name: string) {}
+                handler(@Body('name') name: string) { }
             }
 
             const args = resolveHandlerArguments(
@@ -142,7 +142,7 @@ describe('resolveHandlerArguments', () => {
         it('should extract query param', () => {
             @Injectable()
             class TestController {
-                handler(@Query('page') page: string) {}
+                handler(@Query('page') page: string) { }
             }
 
             const args = resolveHandlerArguments(
@@ -157,7 +157,7 @@ describe('resolveHandlerArguments', () => {
         it('should extract route param', () => {
             @Injectable()
             class TestController {
-                handler(@Param('id') id: string) {}
+                handler(@Param('id') id: string) { }
             }
 
             const args = resolveHandlerArguments(
@@ -172,7 +172,7 @@ describe('resolveHandlerArguments', () => {
         it('should extract header', () => {
             @Injectable()
             class TestController {
-                handler(@Header('authorization') auth: string) {}
+                handler(@Header('authorization') auth: string) { }
             }
 
             const args = resolveHandlerArguments(
@@ -191,7 +191,7 @@ describe('resolveHandlerArguments', () => {
                     @Param('id') id: string,
                     @Query('include') include: string,
                     @Body() body: any
-                ) {}
+                ) { }
             }
 
             const args = resolveHandlerArguments(
@@ -214,7 +214,7 @@ describe('resolveHandlerArguments', () => {
         it('should cast to Number', () => {
             @Injectable()
             class TestController {
-                handler(@Query('count') count: number) {}
+                handler(@Query('count') count: number) { }
             }
 
             const args = resolveHandlerArguments(
@@ -230,7 +230,7 @@ describe('resolveHandlerArguments', () => {
         it('should throw on invalid number cast', () => {
             @Injectable()
             class TestController {
-                handler(@Query('count') count: number) {}
+                handler(@Query('count') count: number) { }
             }
 
             expect(() => resolveHandlerArguments(
@@ -243,7 +243,7 @@ describe('resolveHandlerArguments', () => {
         it('should cast to Boolean', () => {
             @Injectable()
             class TestController {
-                handler(@Query('active') active: boolean) {}
+                handler(@Query('active') active: boolean) { }
             }
 
             const args = resolveHandlerArguments(
@@ -266,7 +266,7 @@ describe('resolveHandlerArguments', () => {
                         validator: rule().required().min(1),
                     })
                     page: number
-                ) {}
+                ) { }
             }
 
             const args = resolveHandlerArguments(
@@ -287,7 +287,7 @@ describe('resolveHandlerArguments', () => {
                         validator: rule().required(),
                     })
                     page: string
-                ) {}
+                ) { }
             }
 
             expect(() => resolveHandlerArguments(
@@ -306,7 +306,7 @@ describe('resolveHandlerArguments', () => {
                         validator: rule().min(18),
                     })
                     age: number
-                ) {}
+                ) { }
             }
 
             expect(() => resolveHandlerArguments(
@@ -325,7 +325,7 @@ describe('resolveHandlerArguments', () => {
                         validator: rule().max(100),
                     })
                     count: number
-                ) {}
+                ) { }
             }
 
             expect(() => resolveHandlerArguments(
@@ -344,7 +344,7 @@ describe('resolveHandlerArguments', () => {
                         validator: rule().minLength(3),
                     })
                     name: string
-                ) {}
+                ) { }
             }
 
             expect(() => resolveHandlerArguments(
@@ -363,7 +363,7 @@ describe('resolveHandlerArguments', () => {
                         validator: rule().pattern(/^[\w-]+@[\w-]+\.\w+$/),
                     })
                     email: string
-                ) {}
+                ) { }
             }
 
             expect(() => resolveHandlerArguments(
@@ -384,7 +384,7 @@ describe('resolveHandlerArguments', () => {
                         validator: isEven,
                     })
                     num: number
-                ) {}
+                ) { }
             }
 
             // Should pass for even number
@@ -408,7 +408,7 @@ describe('resolveHandlerArguments', () => {
         it('should return empty array for method without params', () => {
             @Injectable()
             class TestController {
-                handler() {}
+                handler() { }
             }
 
             const args = resolveHandlerArguments(
@@ -423,7 +423,7 @@ describe('resolveHandlerArguments', () => {
         it('should handle undefined values', () => {
             @Injectable()
             class TestController {
-                handler(@Query('optional') optional: string) {}
+                handler(@Query('optional') optional: string) { }
             }
 
             const args = resolveHandlerArguments(
@@ -438,7 +438,7 @@ describe('resolveHandlerArguments', () => {
         it('should handle header case insensitivity', () => {
             @Injectable()
             class TestController {
-                handler(@Header('Content-Type') contentType: string) {}
+                handler(@Header('Content-Type') contentType: string) { }
             }
 
             const args = resolveHandlerArguments(
