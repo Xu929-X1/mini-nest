@@ -3,13 +3,12 @@ name: Publish to npm
 on:
   push:
     tags:
-      - 'v*.*.*'   # 只有推送 v1.0.0 这类 tag 才触发
+      - 'v*.*.*'   
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g. 1.0.5). Leave blank to auto-increment patch.'
-        required: false
-        default: ''
+        description: 'Version to publish (e.g. 1.0.5). Use at your own descretion, always check current version.'
+        required: true
 
 jobs:
   publish:
