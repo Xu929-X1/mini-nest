@@ -1,7 +1,7 @@
 import autocannon from 'autocannon';
-import { exec, ChildProcess, execSync } from 'child_process';
-import { promisify } from 'util';
+import { ChildProcess, exec, execSync } from 'child_process';
 import { resolve } from 'path';
+import { promisify } from 'util';
 
 const sleep = promisify(setTimeout);
 
@@ -26,7 +26,6 @@ interface BenchmarkResult {
     errors: number;
 }
 
-// 使用绝对路径
 const ROOT = resolve(__dirname, '..');
 
 const SERVERS: ServerConfig[] = [
@@ -53,7 +52,7 @@ const PIPELINING = 10;
 // ============================================
 
 async function startServer(config: ServerConfig): Promise<ChildProcess> {
-    const command = `npx ts-node "${config.script}"`;
+    const command = `npx ts-node -T --project "${resolve(ROOT, 'tsconfig.dev.json')}" "${config.script}"`;
 
     const proc = exec(command, {
         env: { ...process.env, PORT: String(config.port) },
